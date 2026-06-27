@@ -1,0 +1,52 @@
+name: grand_frere_vendor
+description: Grand Frère — Vendor app
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management
+  flutter_bloc: ^8.1.6
+  bloc: ^8.1.4
+  equatable: ^2.0.5
+
+  # DI
+  get_it: ^7.7.0
+
+  # Navigation
+  go_router: ^14.2.7
+
+  # Network
+  dio: ^5.7.0
+
+  # Functional programming
+  fpdart: ^1.1.0
+
+  # Environment
+  flutter_dotenv: ^5.2.1
+
+  # Secure storage
+  flutter_secure_storage: ^9.2.2
+
+  # Fonts
+  google_fonts: ^6.2.1
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - .env
+    - assets/logo.png
