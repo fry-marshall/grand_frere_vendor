@@ -16,6 +16,10 @@ import '../../features/auth/presentation/bloc/forgot_password_bloc/forgot_passwo
 import '../../features/auth/presentation/bloc/login_bloc/login_bloc.dart';
 import '../../features/auth/presentation/bloc/reset_password_bloc/reset_password_bloc.dart';
 import '../../features/auth/presentation/bloc/signup_vendor_bloc/signup_vendor_bloc.dart';
+import '../../features/cashin/data/datasources/cashin_remote_datasource.dart';
+import '../../features/cashin/data/repositories/cashin_repository_impl.dart';
+import '../../features/cashin/domain/repositories/cashin_repository.dart';
+import '../../features/cashin/presentation/cubit/cashin_cubit.dart';
 import '../../features/vendor/data/datasources/vendor_remote_datasource.dart';
 import '../../features/vendor/data/repositories/vendor_repository_impl.dart';
 import '../../features/vendor/domain/repositories/vendor_repository.dart';
@@ -51,6 +55,14 @@ void configureDependencies() {
     () => SchoolRepositoryImpl(getIt<SchoolRemoteDataSource>()),
   );
 
+  // ── Cashin ────────────────────────────────────────────────────────────────
+  getIt.registerLazySingleton<CashinRemoteDataSource>(
+    () => CashinRemoteDataSourceImpl(getIt<ApiClient>()),
+  );
+  getIt.registerLazySingleton<CashinRepository>(
+    () => CashinRepositoryImpl(getIt<CashinRemoteDataSource>()),
+  );
+
   // ── Vendor ────────────────────────────────────────────────────────────────
   getIt.registerLazySingleton<VendorRemoteDataSource>(
     () => VendorRemoteDataSourceImpl(getIt<ApiClient>()),
@@ -76,4 +88,5 @@ void configureDependencies() {
   getIt.registerFactory(() => ForgotPasswordBloc(getIt<AuthRepository>()));
   getIt.registerFactory(() => ResetPasswordBloc(getIt<AuthRepository>()));
   getIt.registerFactory(() => DashboardCubit(getIt<VendorRepository>()));
+  getIt.registerFactory(() => CashinCubit(getIt<CashinRepository>()));
 }

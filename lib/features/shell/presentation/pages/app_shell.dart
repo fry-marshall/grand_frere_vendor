@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../core/widgets/app_toast.dart';
 import '../../../vendor/presentation/pages/account_screen.dart';
 import '../../../vendor/presentation/pages/home_screen.dart';
 import '../../../vendor/presentation/pages/menu_screen.dart';
@@ -33,10 +34,7 @@ class _AppShellState extends State<AppShell> {
       backgroundColor: AppColors.paper,
       body: IndexedStack(index: _index, children: _tabs),
       floatingActionButton: _EncaisserFab(
-        onTap: () => AppToast.show(
-          context,
-          'Encaissement disponible au Sprint 3.',
-        ),
+        onTap: () => context.push(Routes.cashin),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: _BottomBar(

@@ -12,4 +12,5 @@ abstract class Routes {
   static const orders = '/vendor/orders';
   static const menu = '/vendor/menu';
   static const account = '/vendor/account';
+  static const cashin = '/cashin';
 }
