@@ -93,54 +93,61 @@ class _AppTextFieldState extends State<AppTextField> {
                   ]
                 : null,
           ),
-          child: TextField(
-            controller: widget.controller,
-            obscureText: widget.obscureText && _obscure,
-            keyboardType: widget.keyboardType,
-            autofocus: widget.autofocus,
-            focusNode: _effectiveFocus,
-            textCapitalization: widget.textCapitalization,
-            textInputAction: widget.textInputAction,
-            onSubmitted: widget.onSubmitted,
-            style: AppTextStyles.body
-                .copyWith(color: AppColors.ink, fontSize: 15, height: 1.0),
-            decoration: InputDecoration(
-              hintText: widget.placeholder,
-              hintStyle: AppTextStyles.body.copyWith(
-                color: AppColors.mute,
-                fontSize: 15,
-                height: 1.0,
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: widget.controller,
+                  obscureText: widget.obscureText && _obscure,
+                  keyboardType: widget.keyboardType,
+                  autofocus: widget.autofocus,
+                  focusNode: _effectiveFocus,
+                  textCapitalization: widget.textCapitalization,
+                  textInputAction: widget.textInputAction,
+                  onSubmitted: widget.onSubmitted,
+                  style: AppTextStyles.body.copyWith(
+                    color: AppColors.ink,
+                    fontSize: 15,
+                    height: 1.0,
+                  ),
+                  decoration: InputDecoration(
+                    hintText: widget.placeholder,
+                    hintStyle: AppTextStyles.body.copyWith(
+                      color: AppColors.mute,
+                      fontSize: 15,
+                      height: 1.0,
+                    ),
+                    prefixText: widget.prefixText,
+                    prefixStyle: AppTextStyles.body.copyWith(
+                      color: AppColors.mute,
+                      fontSize: 15,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 11,
+                    ),
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    filled: false,
+                  ),
+                ),
               ),
-              prefixText: widget.prefixText,
-              prefixStyle: AppTextStyles.body.copyWith(
-                color: AppColors.mute,
-                fontSize: 15,
-              ),
-              suffixIcon: widget.obscureText
-                  ? TextButton(
-                      onPressed: () => setState(() => _obscure = !_obscure),
-                      style: TextButton.styleFrom(
-                        foregroundColor: AppColors.mute,
-                        padding: const EdgeInsets.only(right: 4),
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              if (widget.obscureText)
+                GestureDetector(
+                  onTap: () => setState(() => _obscure = !_obscure),
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 14),
+                    child: Text(
+                      _obscure ? 'Voir' : 'Masquer',
+                      style: AppTextStyles.body.copyWith(
+                        color: AppColors.mute,
+                        fontSize: 13,
                       ),
-                      child: Text(
-                        _obscure ? 'Voir' : 'Masquer',
-                        style: AppTextStyles.body.copyWith(
-                          color: AppColors.mute,
-                          fontSize: 13,
-                        ),
-                      ),
-                    )
-                  : null,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              filled: false,
-            ),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
         if (widget.helperText != null)
