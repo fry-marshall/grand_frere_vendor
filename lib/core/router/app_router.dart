@@ -9,6 +9,7 @@ import '../../features/auth/presentation/pages/signup_vendor_screen.dart';
 import '../../features/auth/presentation/pages/forgot_password_screen.dart';
 import '../../features/auth/presentation/pages/reset_password_screen.dart';
 import '../../features/auth/presentation/pages/pending_approval_screen.dart';
+import '../../features/shell/presentation/pages/app_shell.dart';
 import 'go_router_refresh_stream.dart';
 import 'routes.dart';
 
@@ -48,7 +49,7 @@ class AppRouter {
         ),
         GoRoute(
           path: Routes.home,
-          builder: (_, _) => const _VendorHomePlaceholder(),
+          builder: (_, _) => const AppShell(),
         ),
       ],
     );
@@ -91,11 +92,3 @@ class AppRouter {
   }
 }
 
-class _VendorHomePlaceholder extends StatelessWidget {
-  const _VendorHomePlaceholder();
-
-  @override
-  Widget build(BuildContext context) => const Scaffold(
-        body: Center(child: Text('Home — Sprint 2')),
-      );
-}

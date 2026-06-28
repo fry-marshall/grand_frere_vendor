@@ -9,4 +9,7 @@ abstract class Routes {
   // Vendor
   static const pending = '/vendor/pending';
   static const home = '/vendor/home';
+  static const orders = '/vendor/orders';
+  static const menu = '/vendor/menu';
+  static const account = '/vendor/account';
 }
