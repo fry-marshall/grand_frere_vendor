@@ -31,6 +31,9 @@ import '../../features/menu/data/datasources/items_remote_datasource.dart';
 import '../../features/menu/data/repositories/items_repository_impl.dart';
 import '../../features/menu/domain/repositories/items_repository.dart';
 import '../../features/menu/presentation/cubit/items_cubit.dart';
+import '../../features/balance/data/datasources/balance_remote_datasource.dart';
+import '../../features/balance/data/repositories/balance_repository_impl.dart';
+import '../../features/balance/domain/repositories/balance_repository.dart';
 import '../../features/vendor/presentation/cubit/dashboard_cubit.dart';
 import '../../features/vendor/presentation/cubit/vendor_cubit.dart';
 
@@ -85,6 +88,14 @@ void configureDependencies() {
   );
   getIt.registerLazySingleton<OrdersRepository>(
     () => OrdersRepositoryImpl(getIt<OrdersRemoteDataSource>()),
+  );
+
+  // ── Balance & Withdrawals ─────────────────────────────────────────────────
+  getIt.registerLazySingleton<BalanceRemoteDataSource>(
+    () => BalanceRemoteDataSourceImpl(getIt<ApiClient>()),
+  );
+  getIt.registerLazySingleton<BalanceRepository>(
+    () => BalanceRepositoryImpl(getIt<BalanceRemoteDataSource>()),
   );
 
   // ── Menu (Items) ──────────────────────────────────────────────────────────
