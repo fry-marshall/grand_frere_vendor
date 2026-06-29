@@ -9,8 +9,14 @@ import '../../features/auth/presentation/pages/signup_vendor_screen.dart';
 import '../../features/auth/presentation/pages/forgot_password_screen.dart';
 import '../../features/auth/presentation/pages/reset_password_screen.dart';
 import '../../features/auth/presentation/pages/pending_approval_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../features/cashin/presentation/pages/cashin_screen.dart';
+import '../../features/orders/domain/entities/vendor_order.dart';
+import '../../features/orders/presentation/cubit/orders_cubit.dart';
+import '../../features/orders/presentation/pages/order_detail_screen.dart';
 import '../../features/shell/presentation/pages/app_shell.dart';
+import '../di/injection.dart';
 import 'go_router_refresh_stream.dart';
 import 'routes.dart';
 
@@ -55,6 +61,13 @@ class AppRouter {
         GoRoute(
           path: Routes.cashin,
           builder: (_, _) => const CashinScreen(),
+        ),
+        GoRoute(
+          path: Routes.orderDetail,
+          builder: (_, state) => BlocProvider.value(
+            value: getIt<OrdersCubit>(),
+            child: OrderDetailScreen(order: state.extra as VendorOrder),
+          ),
         ),
       ],
     );

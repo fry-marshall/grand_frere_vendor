@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/di/injection.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../orders/presentation/cubit/orders_cubit.dart';
+import '../../../orders/presentation/pages/orders_screen.dart';
+import '../../../vendor/presentation/cubit/vendor_cubit.dart';
+import '../../../vendor/presentation/cubit/vendor_state.dart';
 import '../../../vendor/presentation/pages/account_screen.dart';
 import '../../../vendor/presentation/pages/home_screen.dart';
 import '../../../vendor/presentation/pages/menu_screen.dart';
-import '../../../vendor/presentation/pages/orders_screen.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -27,20 +32,34 @@ class _AppShellState extends State<AppShell> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final vs = context.read<VendorCubit>().state;
+      if (vs is VendorLoaded) {
+        getIt<OrdersCubit>().load(vs.vendor.id);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final bottomPad = MediaQuery.paddingOf(context).bottom;
 
-    return Scaffold(
-      backgroundColor: AppColors.paper,
-      body: IndexedStack(index: _index, children: _tabs),
-      floatingActionButton: _EncaisserFab(
-        onTap: () => context.push(Routes.cashin),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      bottomNavigationBar: _BottomBar(
-        index: _index,
-        bottomPad: bottomPad,
-        onTab: (i) => setState(() => _index = i),
+    return BlocProvider.value(
+      value: getIt<OrdersCubit>(),
+      child: Scaffold(
+        backgroundColor: AppColors.paper,
+        body: IndexedStack(index: _index, children: _tabs),
+        floatingActionButton: _EncaisserFab(
+          onTap: () => context.push(Routes.cashin),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        bottomNavigationBar: _BottomBar(
+          index: _index,
+          bottomPad: bottomPad,
+          onTab: (i) => setState(() => _index = i),
+        ),
       ),
     );
   }

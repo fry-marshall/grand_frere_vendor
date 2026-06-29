@@ -23,6 +23,10 @@ import '../../features/cashin/presentation/cubit/cashin_cubit.dart';
 import '../../features/vendor/data/datasources/vendor_remote_datasource.dart';
 import '../../features/vendor/data/repositories/vendor_repository_impl.dart';
 import '../../features/vendor/domain/repositories/vendor_repository.dart';
+import '../../features/orders/data/datasources/orders_remote_datasource.dart';
+import '../../features/orders/data/repositories/orders_repository_impl.dart';
+import '../../features/orders/domain/repositories/orders_repository.dart';
+import '../../features/orders/presentation/cubit/orders_cubit.dart';
 import '../../features/vendor/presentation/cubit/dashboard_cubit.dart';
 import '../../features/vendor/presentation/cubit/vendor_cubit.dart';
 
@@ -71,11 +75,20 @@ void configureDependencies() {
     () => VendorRepositoryImpl(getIt<VendorRemoteDataSource>()),
   );
 
+  // ── Orders ────────────────────────────────────────────────────────────────
+  getIt.registerLazySingleton<OrdersRemoteDataSource>(
+    () => OrdersRemoteDataSourceImpl(getIt<ApiClient>()),
+  );
+  getIt.registerLazySingleton<OrdersRepository>(
+    () => OrdersRepositoryImpl(getIt<OrdersRemoteDataSource>()),
+  );
+
   // ── Global BLoCs (singletons) ─────────────────────────────────────────────
   getIt.registerSingleton(
     AuthBloc(getIt<TokenStorage>(), getIt<AuthStatus>()),
   );
   getIt.registerSingleton(VendorCubit(getIt<VendorRepository>()));
+  getIt.registerSingleton(OrdersCubit(getIt<OrdersRepository>()));
 
   // ── Router ────────────────────────────────────────────────────────────────
   getIt.registerLazySingleton(() => AppRouter(getIt<AuthBloc>()));
