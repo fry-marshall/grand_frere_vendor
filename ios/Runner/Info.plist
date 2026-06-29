@@ -28,6 +28,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>La caméra est utilisée pour scanner les cartes Grand Frère lors de l'encaissement.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Permet de sélectionner une photo pour illustrer vos articles.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

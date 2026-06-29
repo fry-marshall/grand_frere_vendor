@@ -6,13 +6,14 @@ import '../../../../core/di/injection.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../menu/presentation/cubit/items_cubit.dart';
+import '../../../menu/presentation/pages/menu_screen.dart';
 import '../../../orders/presentation/cubit/orders_cubit.dart';
 import '../../../orders/presentation/pages/orders_screen.dart';
 import '../../../vendor/presentation/cubit/vendor_cubit.dart';
 import '../../../vendor/presentation/cubit/vendor_state.dart';
 import '../../../vendor/presentation/pages/account_screen.dart';
 import '../../../vendor/presentation/pages/home_screen.dart';
-import '../../../vendor/presentation/pages/menu_screen.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -38,6 +39,7 @@ class _AppShellState extends State<AppShell> {
       final vs = context.read<VendorCubit>().state;
       if (vs is VendorLoaded) {
         getIt<OrdersCubit>().load(vs.vendor.id);
+        getIt<ItemsCubit>().load(vs.vendor.id);
       }
     });
   }
@@ -46,8 +48,11 @@ class _AppShellState extends State<AppShell> {
   Widget build(BuildContext context) {
     final bottomPad = MediaQuery.paddingOf(context).bottom;
 
-    return BlocProvider.value(
-      value: getIt<OrdersCubit>(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: getIt<OrdersCubit>()),
+        BlocProvider.value(value: getIt<ItemsCubit>()),
+      ],
       child: Scaffold(
         backgroundColor: AppColors.paper,
         body: IndexedStack(index: _index, children: _tabs),
@@ -64,6 +69,7 @@ class _AppShellState extends State<AppShell> {
     );
   }
 }
+
 
 // ── FAB Encaisser ─────────────────────────────────────────────────────────────
 

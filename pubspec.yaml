@@ -37,6 +37,9 @@ dependencies:
   # QR scanner
   mobile_scanner: ^5.0.0
 
+  # Image picker (upload photo article)
+  image_picker: ^1.1.2
+
   # Fonts
   google_fonts: ^6.2.1
 
