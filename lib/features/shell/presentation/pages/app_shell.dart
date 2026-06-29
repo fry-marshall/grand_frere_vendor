@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../menu/presentation/cubit/items_cubit.dart';
 import '../../../menu/presentation/pages/menu_screen.dart';
+import '../../../notifications/presentation/cubit/notifications_cubit.dart';
 import '../../../orders/presentation/cubit/orders_cubit.dart';
 import '../../../orders/presentation/pages/orders_screen.dart';
 import '../../../vendor/presentation/cubit/vendor_cubit.dart';
@@ -40,6 +41,7 @@ class _AppShellState extends State<AppShell> {
       if (vs is VendorLoaded) {
         getIt<OrdersCubit>().load(vs.vendor.id);
         getIt<ItemsCubit>().load(vs.vendor.id);
+        getIt<NotificationsCubit>().load();
       }
     });
   }
@@ -52,6 +54,7 @@ class _AppShellState extends State<AppShell> {
       providers: [
         BlocProvider.value(value: getIt<OrdersCubit>()),
         BlocProvider.value(value: getIt<ItemsCubit>()),
+        BlocProvider.value(value: getIt<NotificationsCubit>()),
       ],
       child: Scaffold(
         backgroundColor: AppColors.paper,

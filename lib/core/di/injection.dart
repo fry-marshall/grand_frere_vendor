@@ -34,6 +34,10 @@ import '../../features/menu/presentation/cubit/items_cubit.dart';
 import '../../features/balance/data/datasources/balance_remote_datasource.dart';
 import '../../features/balance/data/repositories/balance_repository_impl.dart';
 import '../../features/balance/domain/repositories/balance_repository.dart';
+import '../../features/notifications/data/datasources/notifications_remote_datasource.dart';
+import '../../features/notifications/data/repositories/notifications_repository_impl.dart';
+import '../../features/notifications/domain/repositories/notifications_repository.dart';
+import '../../features/notifications/presentation/cubit/notifications_cubit.dart';
 import '../../features/vendor/presentation/cubit/dashboard_cubit.dart';
 import '../../features/vendor/presentation/cubit/vendor_cubit.dart';
 
@@ -90,6 +94,14 @@ void configureDependencies() {
     () => OrdersRepositoryImpl(getIt<OrdersRemoteDataSource>()),
   );
 
+  // ── Notifications ─────────────────────────────────────────────────────────
+  getIt.registerLazySingleton<NotificationsRemoteDataSource>(
+    () => NotificationsRemoteDataSourceImpl(getIt<ApiClient>()),
+  );
+  getIt.registerLazySingleton<NotificationsRepository>(
+    () => NotificationsRepositoryImpl(getIt<NotificationsRemoteDataSource>()),
+  );
+
   // ── Balance & Withdrawals ─────────────────────────────────────────────────
   getIt.registerLazySingleton<BalanceRemoteDataSource>(
     () => BalanceRemoteDataSourceImpl(getIt<ApiClient>()),
@@ -113,6 +125,7 @@ void configureDependencies() {
   getIt.registerSingleton(VendorCubit(getIt<VendorRepository>()));
   getIt.registerSingleton(OrdersCubit(getIt<OrdersRepository>()));
   getIt.registerSingleton(ItemsCubit(getIt<ItemsRepository>()));
+  getIt.registerSingleton(NotificationsCubit(getIt<NotificationsRepository>()));
 
   // ── Router ────────────────────────────────────────────────────────────────
   getIt.registerLazySingleton(() => AppRouter(getIt<AuthBloc>()));

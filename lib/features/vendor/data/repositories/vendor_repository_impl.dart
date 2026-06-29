@@ -44,4 +44,27 @@ class VendorRepositoryImpl implements VendorRepository {
       return Left(ServerFailure(e.firstMessage));
     }
   }
+
+  @override
+  Future<Either<Failure, Vendor>> updateVendor(
+    String id, {
+    String? shopName,
+    String? waveNumber,
+    String? openingTime,
+    String? closingTime,
+  }) async {
+    try {
+      final model = await _remote.updateVendor(
+        id,
+        shopName: shopName,
+        waveNumber: waveNumber,
+        openingTime: openingTime,
+        closingTime: closingTime,
+      );
+      return Right(model.toDomain());
+    } on ApiException catch (e) {
+      if (e.isNetworkError) return const Left(NetworkFailure());
+      return Left(ServerFailure(e.firstMessage));
+    }
+  }
 }

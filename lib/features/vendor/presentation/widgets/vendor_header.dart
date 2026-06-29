@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../notifications/presentation/cubit/notifications_cubit.dart';
+import '../../../notifications/presentation/cubit/notifications_state.dart';
 import '../../domain/entities/vendor.dart';
 
 class VendorHeader extends StatelessWidget {
@@ -90,24 +95,58 @@ class _Avatar extends StatelessWidget {
 class _NotificationBell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.ink.withAlpha(26),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: const Icon(
-        Icons.notifications_outlined,
-        color: AppColors.maroon,
-        size: 20,
+    return GestureDetector(
+      onTap: () => context.push(Routes.notifications),
+      child: BlocBuilder<NotificationsCubit, NotificationsState>(
+        builder: (_, state) {
+          final unread =
+              state is NotificationsLoaded ? state.unreadCount : 0;
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.ink.withAlpha(26),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.notifications_outlined,
+                  color: AppColors.maroon,
+                  size: 20,
+                ),
+              ),
+              if (unread > 0)
+                Positioned(
+                  right: -2,
+                  top: -2,
+                  child: Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: const BoxDecoration(
+                      color: AppColors.dangerText,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      unread > 9 ? '9+' : '$unread',
+                      style: AppTextStyles.label.copyWith(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }

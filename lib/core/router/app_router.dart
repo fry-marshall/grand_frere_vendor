@@ -14,6 +14,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../features/balance/domain/repositories/balance_repository.dart';
 import '../../features/balance/presentation/cubit/balance_cubit.dart';
 import '../../features/balance/presentation/pages/balance_screen.dart';
+import '../../features/notifications/presentation/cubit/notifications_cubit.dart';
+import '../../features/notifications/presentation/pages/notifications_screen.dart';
 import '../../features/cashin/presentation/pages/cashin_screen.dart';
 import '../../features/orders/domain/entities/vendor_order.dart';
 import '../../features/orders/presentation/cubit/orders_cubit.dart';
@@ -72,6 +74,13 @@ class AppRouter {
           builder: (_, state) => BlocProvider.value(
             value: getIt<OrdersCubit>(),
             child: OrderDetailScreen(order: state.extra as VendorOrder),
+          ),
+        ),
+        GoRoute(
+          path: Routes.notifications,
+          builder: (_, _) => BlocProvider.value(
+            value: getIt<NotificationsCubit>(),
+            child: const NotificationsScreen(),
           ),
         ),
         GoRoute(

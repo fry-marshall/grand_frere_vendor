@@ -9,4 +9,11 @@ abstract class VendorRepository {
   Future<Either<Failure, Vendor>> getVendor();
   Future<Either<Failure, VendorStats>> getStats(String id);
   Future<Either<Failure, VendorBalance>> getBalance(String id);
+  Future<Either<Failure, Vendor>> updateVendor(
+    String id, {
+    String? shopName,
+    String? waveNumber,
+    String? openingTime,
+    String? closingTime,
+  });
 }

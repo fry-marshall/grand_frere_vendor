@@ -24,6 +24,11 @@ abstract class AuthRemoteDataSource {
     required String code,
     required String newPassword,
   });
+
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  });
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -88,6 +93,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     await _client.post(
       '/auth/reset-password',
       data: {'phone': phone, 'code': code, 'newPassword': newPassword},
+    );
+  }
+
+  @override
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    await _client.put(
+      '/auth/change-password',
+      data: {'currentPassword': currentPassword, 'newPassword': newPassword},
     );
   }
 }
