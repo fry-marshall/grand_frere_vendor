@@ -37,6 +37,18 @@ class AccountCubit extends Cubit<AccountState> {
     );
   }
 
+  Future<void> uploadPhoto(String vendorId, String filePath) async {
+    emit(AccountSaving());
+    final result = await _vendorRepo.uploadPhoto(vendorId, filePath);
+    result.fold(
+      (f) => emit(AccountError(f.message)),
+      (_) {
+        _vendorCubit.load();
+        emit(AccountSuccess());
+      },
+    );
+  }
+
   Future<void> changePassword({
     required String currentPassword,
     required String newPassword,

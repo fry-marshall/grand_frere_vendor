@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
@@ -38,6 +41,7 @@ class _ItemFormSheetState extends State<ItemFormSheet> {
   late final TextEditingController _description;
   final _formKey = GlobalKey<FormState>();
   bool _saving = false;
+  XFile? _pickedImage;
 
   bool get isEdit => widget.item != null;
 
@@ -57,6 +61,24 @@ class _ItemFormSheetState extends State<ItemFormSheet> {
     _price.dispose();
     _description.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    final file = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+      maxWidth: 1024,
+    );
+    if (file == null) return;
+    if (isEdit) {
+      // In edit mode, upload immediately without waiting for form submit
+      if (!mounted) return;
+      setState(() => _saving = true);
+      await context.read<ItemsCubit>().uploadImage(widget.item!.id, file.path);
+      if (mounted) setState(() => _saving = false);
+    } else {
+      setState(() => _pickedImage = file);
+    }
   }
 
   Future<void> _submit() async {
@@ -81,6 +103,7 @@ class _ItemFormSheetState extends State<ItemFormSheet> {
             name: name,
             price: price,
             description: description.isNotEmpty ? description : null,
+            imagePath: _pickedImage?.path,
           );
     }
 
@@ -130,6 +153,12 @@ class _ItemFormSheetState extends State<ItemFormSheet> {
                 style: AppTextStyles.h2.copyWith(color: AppColors.ink),
               ),
               SizedBox(height: AppSpacing.lg),
+              _ImagePicker(
+                currentUrl: widget.item?.imageUrl,
+                pickedFile: _pickedImage,
+                onTap: _saving ? null : _pickImage,
+              ),
+              SizedBox(height: AppSpacing.md),
               _Field(
                 controller: _name,
                 label: 'Nom',
@@ -196,6 +225,76 @@ class _ItemFormSheetState extends State<ItemFormSheet> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _ImagePicker extends StatelessWidget {
+  const _ImagePicker({
+    required this.currentUrl,
+    required this.pickedFile,
+    required this.onTap,
+  });
+
+  final String? currentUrl;
+  final XFile? pickedFile;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasImage = currentUrl != null || pickedFile != null;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 100,
+        decoration: BoxDecoration(
+          color: AppColors.paper,
+          borderRadius: AppRadius.sm,
+          border: Border.all(color: AppColors.line),
+          image: hasImage
+              ? DecorationImage(
+                  image: currentUrl != null && pickedFile == null
+                      ? NetworkImage(currentUrl!) as ImageProvider
+                      : FileImage(File(pickedFile!.path)),
+                  fit: BoxFit.cover,
+                )
+              : null,
+        ),
+        child: hasImage
+            ? Align(
+                alignment: Alignment.bottomRight,
+                child: Padding(
+                  padding: const EdgeInsets.all(6),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      borderRadius: AppRadius.pill,
+                    ),
+                    child: const Icon(
+                      Icons.camera_alt_outlined,
+                      color: Colors.white,
+                      size: 14,
+                    ),
+                  ),
+                ),
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.add_photo_alternate_outlined,
+                    color: AppColors.mute,
+                    size: 28,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Ajouter une photo',
+                    style: AppTextStyles.caption.copyWith(color: AppColors.mute),
+                  ),
+                ],
+              ),
       ),
     );
   }

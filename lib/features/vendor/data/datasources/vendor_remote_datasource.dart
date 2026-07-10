@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+
 import '../../../../core/network/api_client.dart';
 import '../models/vendor_balance_model.dart';
 import '../models/vendor_model.dart';
@@ -14,6 +16,7 @@ abstract class VendorRemoteDataSource {
     String? openingTime,
     String? closingTime,
   });
+  Future<VendorModel> uploadPhoto(String id, String filePath);
 }
 
 class VendorRemoteDataSourceImpl implements VendorRemoteDataSource {
@@ -53,6 +56,15 @@ class VendorRemoteDataSourceImpl implements VendorRemoteDataSource {
     if (openingTime != null) body['openingTime'] = openingTime;
     if (closingTime != null) body['closingTime'] = closingTime;
     final res = await _client.put('/vendors/$id', data: body);
+    return VendorModel.fromJson(res.data['data'] as Map<String, dynamic>);
+  }
+
+  @override
+  Future<VendorModel> uploadPhoto(String id, String filePath) async {
+    final formData = FormData.fromMap({
+      'file': await MultipartFile.fromFile(filePath),
+    });
+    final res = await _client.put('/vendors/$id/photo', data: formData);
     return VendorModel.fromJson(res.data['data'] as Map<String, dynamic>);
   }
 }

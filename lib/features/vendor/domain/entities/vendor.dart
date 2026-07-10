@@ -9,6 +9,7 @@ class Vendor {
     this.waveNumber,
     this.openingTime,
     this.closingTime,
+    this.photoUrl,
   });
 
   final String id;
@@ -20,6 +21,7 @@ class Vendor {
   final String? waveNumber;
   final String? openingTime;
   final String? closingTime;
+  final String? photoUrl;
 
   String get fullName => '$firstName $lastName';
 

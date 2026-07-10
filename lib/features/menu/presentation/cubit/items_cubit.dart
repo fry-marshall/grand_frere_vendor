@@ -28,6 +28,7 @@ class ItemsCubit extends Cubit<ItemsState> {
     required String name,
     required int price,
     String? description,
+    String? imagePath,
   }) async {
     if (_vendorId == null) return;
     final loaded = state is ItemsLoaded ? state as ItemsLoaded : null;
@@ -38,11 +39,16 @@ class ItemsCubit extends Cubit<ItemsState> {
       price: price,
       description: description,
     );
-    result.fold(
-      (f) => loaded != null
+    await result.fold(
+      (f) async => loaded != null
           ? emit(ItemsActionError(message: f.message, previous: loaded))
           : emit(ItemsError(f.message)),
-      (_) => load(_vendorId!),
+      (newItem) async {
+        if (imagePath != null) {
+          await _repo.uploadImage(newItem.id, imagePath);
+        }
+        await load(_vendorId!);
+      },
     );
   }
 

@@ -19,7 +19,7 @@ class VendorHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(22, 6, 22, 14),
       child: Row(
         children: [
-          _Avatar(initials: vendor?.initials ?? ''),
+          _Avatar(initials: vendor?.initials ?? '', photoUrl: vendor?.photoUrl),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -55,22 +55,31 @@ class VendorHeader extends StatelessWidget {
 }
 
 class _Avatar extends StatelessWidget {
-  const _Avatar({required this.initials});
+  const _Avatar({required this.initials, this.photoUrl});
   final String initials;
+  final String? photoUrl;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: 44,
       height: 44,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColors.gold, AppColors.carrot],
-        ),
-        boxShadow: [
+        gradient: photoUrl == null
+            ? const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.gold, AppColors.carrot],
+              )
+            : null,
+        image: photoUrl != null
+            ? DecorationImage(
+                image: NetworkImage(photoUrl!),
+                fit: BoxFit.cover,
+              )
+            : null,
+        boxShadow: const [
           BoxShadow(
             color: Color(0x2E5B1E0F),
             blurRadius: 10,
@@ -78,16 +87,18 @@ class _Avatar extends StatelessWidget {
           ),
         ],
       ),
-      child: Center(
-        child: Text(
-          initials,
-          style: AppTextStyles.body.copyWith(
-            color: Colors.white,
-            fontSize: 17,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ),
+      child: photoUrl == null
+          ? Center(
+              child: Text(
+                initials,
+                style: AppTextStyles.body.copyWith(
+                  color: Colors.white,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            )
+          : null,
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/di/injection.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -125,27 +126,76 @@ class _ProfileHeader extends StatelessWidget {
   const _ProfileHeader({this.vendor});
   final Vendor? vendor;
 
+  Future<void> _pickAndUpload(BuildContext context) async {
+    if (vendor == null) return;
+    final picker = ImagePicker();
+    final file = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+      maxWidth: 512,
+    );
+    if (file == null) return;
+    if (!context.mounted) return;
+    await context.read<AccountCubit>().uploadPhoto(vendor!.id, file.path);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Container(
-          width: 64,
-          height: 64,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [AppColors.gold, AppColors.carrot],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            boxShadow: AppShadows.md,
-          ),
-          child: Center(
-            child: Text(
-              vendor?.initials ?? '?',
-              style: AppTextStyles.h2.copyWith(color: Colors.white, fontSize: 22),
-            ),
+        GestureDetector(
+          onTap: () => _pickAndUpload(context),
+          child: Stack(
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: vendor?.photoUrl == null
+                      ? const LinearGradient(
+                          colors: [AppColors.gold, AppColors.carrot],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        )
+                      : null,
+                  image: vendor?.photoUrl != null
+                      ? DecorationImage(
+                          image: NetworkImage(vendor!.photoUrl!),
+                          fit: BoxFit.cover,
+                        )
+                      : null,
+                  boxShadow: AppShadows.md,
+                ),
+                child: vendor?.photoUrl == null
+                    ? Center(
+                        child: Text(
+                          vendor?.initials ?? '?',
+                          style: AppTextStyles.h2
+                              .copyWith(color: Colors.white, fontSize: 22),
+                        ),
+                      )
+                    : null,
+              ),
+              Positioned(
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: AppColors.gold,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.white, width: 1.5),
+                  ),
+                  child: const Icon(
+                    Icons.camera_alt_outlined,
+                    color: Colors.white,
+                    size: 11,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         SizedBox(width: AppSpacing.md),

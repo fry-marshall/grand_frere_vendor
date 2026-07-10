@@ -67,4 +67,16 @@ class VendorRepositoryImpl implements VendorRepository {
       return Left(ServerFailure(e.firstMessage));
     }
   }
+
+  @override
+  Future<Either<Failure, Vendor>> uploadPhoto(
+      String id, String filePath) async {
+    try {
+      final model = await _remote.uploadPhoto(id, filePath);
+      return Right(model.toDomain());
+    } on ApiException catch (e) {
+      if (e.isNetworkError) return const Left(NetworkFailure());
+      return Left(ServerFailure(e.firstMessage));
+    }
+  }
 }

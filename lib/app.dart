@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:grand_frere_vendor/core/storage/token_storage.dart';
 
 import 'core/auth/auth_bloc/auth_bloc.dart';
 import 'core/auth/auth_bloc/auth_event.dart';
@@ -24,6 +25,8 @@ class _AppState extends State<App> {
     super.initState();
     _appRouter = getIt<AppRouter>();
     getIt<AuthBloc>().add(const AuthCheckRequested());
+    /* TokenStorage tokenStorage = getIt<TokenStorage>();
+    tokenStorage.clearTokens(); */
   }
 
   @override

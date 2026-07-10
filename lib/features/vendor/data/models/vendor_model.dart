@@ -11,6 +11,7 @@ class VendorModel {
     this.waveNumber,
     this.openingTime,
     this.closingTime,
+    this.photoUrl,
   });
 
   final String id;
@@ -22,6 +23,7 @@ class VendorModel {
   final String? waveNumber;
   final String? openingTime;
   final String? closingTime;
+  final String? photoUrl;
 
   factory VendorModel.fromJson(Map<String, dynamic> json) {
     final user = json['user'] as Map<String, dynamic>;
@@ -35,6 +37,7 @@ class VendorModel {
       waveNumber: json['waveNumber'] as String?,
       openingTime: json['openingTime'] as String?,
       closingTime: json['closingTime'] as String?,
+      photoUrl: json['photoUrl'] as String?,
     );
   }
 
@@ -48,5 +51,6 @@ class VendorModel {
         waveNumber: waveNumber,
         openingTime: openingTime,
         closingTime: closingTime,
+        photoUrl: photoUrl,
       );
 }

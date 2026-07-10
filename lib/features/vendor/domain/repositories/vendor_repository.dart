@@ -16,4 +16,5 @@ abstract class VendorRepository {
     String? openingTime,
     String? closingTime,
   });
+  Future<Either<Failure, Vendor>> uploadPhoto(String id, String filePath);
 }
