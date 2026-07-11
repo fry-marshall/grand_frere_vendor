@@ -31,4 +31,7 @@ abstract class AuthRepository {
     required String currentPassword,
     required String newPassword,
   });
+
+  /// Registers (or clears, when `null`) the FCM push token for the current user.
+  Future<Either<Failure, void>> updateFcmToken(String? fcmToken);
 }

@@ -3,6 +3,7 @@ import '../models/vendor_order_model.dart';
 
 abstract class OrdersRemoteDataSource {
   Future<List<VendorOrderModel>> getOrders(String vendorId);
+  Future<VendorOrderModel> getOrderById(String orderId);
   Future<void> validateOrder(String orderId);
   Future<void> cancelOrder(String orderId);
 }
@@ -22,6 +23,12 @@ class OrdersRemoteDataSourceImpl implements OrdersRemoteDataSource {
     return items
         .map((e) => VendorOrderModel.fromJson(e as Map<String, dynamic>))
         .toList();
+  }
+
+  @override
+  Future<VendorOrderModel> getOrderById(String orderId) async {
+    final res = await _client.get('/orders/$orderId');
+    return VendorOrderModel.fromJson(res.data['data'] as Map<String, dynamic>);
   }
 
   @override

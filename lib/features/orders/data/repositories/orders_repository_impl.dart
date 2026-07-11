@@ -22,6 +22,18 @@ class OrdersRepositoryImpl implements OrdersRepository {
   }
 
   @override
+  Future<Either<Failure, VendorOrder>> getOrderById(String orderId) async {
+    try {
+      final order = await _ds.getOrderById(orderId);
+      return Right(order);
+    } on ApiException catch (e) {
+      if (e.isNetworkError) return const Left(NetworkFailure());
+      if (e.isNotFound) return Left(NotFoundFailure(e.firstMessage));
+      return Left(ServerFailure(e.firstMessage));
+    }
+  }
+
+  @override
   Future<Either<Failure, void>> validateOrder(String orderId) async {
     try {
       await _ds.validateOrder(orderId);

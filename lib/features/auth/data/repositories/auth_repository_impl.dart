@@ -108,6 +108,18 @@ class AuthRepositoryImpl implements AuthRepository {
       return const Right(null);
     } on ApiException catch (e) {
       if (e.isNetworkError) return const Left(NetworkFailure());
+      if (e.isUnauthorized) return const Left(UnauthorizedFailure('Le mot de passe actuel est incorrecte.'));
+      return Left(ServerFailure(e.firstMessage));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateFcmToken(String? fcmToken) async {
+    try {
+      await _remote.updateFcmToken(fcmToken);
+      return const Right(null);
+    } on ApiException catch (e) {
+      if (e.isNetworkError) return const Left(NetworkFailure());
       return Left(ServerFailure(e.firstMessage));
     }
   }

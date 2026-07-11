@@ -29,6 +29,8 @@ abstract class AuthRemoteDataSource {
     required String currentPassword,
     required String newPassword,
   });
+
+  Future<void> updateFcmToken(String? fcmToken);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -105,5 +107,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       '/auth/change-password',
       data: {'currentPassword': currentPassword, 'newPassword': newPassword},
     );
+  }
+
+  @override
+  Future<void> updateFcmToken(String? fcmToken) async {
+    await _client.put('/auth/fcm-token', data: {'fcmToken': fcmToken});
   }
 }

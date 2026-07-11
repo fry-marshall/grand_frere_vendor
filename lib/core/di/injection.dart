@@ -4,6 +4,7 @@ import '../auth/auth_bloc/auth_bloc.dart';
 import '../auth/auth_status.dart';
 import '../network/api_client.dart';
 import '../network/auth_interceptor.dart';
+import '../notifications/push_notification_service.dart';
 import '../router/app_router.dart';
 import '../storage/token_storage.dart';
 import '../../features/auth/data/datasources/auth_remote_datasource.dart';
@@ -34,6 +35,7 @@ import '../../features/menu/presentation/cubit/items_cubit.dart';
 import '../../features/balance/data/datasources/balance_remote_datasource.dart';
 import '../../features/balance/data/repositories/balance_repository_impl.dart';
 import '../../features/balance/domain/repositories/balance_repository.dart';
+import '../../features/balance/presentation/cubit/balance_cubit.dart';
 import '../../features/notifications/data/datasources/notifications_remote_datasource.dart';
 import '../../features/notifications/data/repositories/notifications_repository_impl.dart';
 import '../../features/notifications/domain/repositories/notifications_repository.dart';
@@ -120,15 +122,25 @@ void configureDependencies() {
 
   // ── Global BLoCs (singletons) ─────────────────────────────────────────────
   getIt.registerSingleton(
-    AuthBloc(getIt<TokenStorage>(), getIt<AuthStatus>()),
+    AuthBloc(getIt<TokenStorage>(), getIt<AuthStatus>(), getIt<AuthRepository>()),
   );
   getIt.registerSingleton(VendorCubit(getIt<VendorRepository>()));
   getIt.registerSingleton(OrdersCubit(getIt<OrdersRepository>()));
   getIt.registerSingleton(ItemsCubit(getIt<ItemsRepository>()));
   getIt.registerSingleton(NotificationsCubit(getIt<NotificationsRepository>()));
+  getIt.registerSingleton(BalanceCubit(getIt<BalanceRepository>()));
 
   // ── Router ────────────────────────────────────────────────────────────────
   getIt.registerLazySingleton(() => AppRouter(getIt<AuthBloc>()));
+
+  // ── Push notifications ───────────────────────────────────────────────────
+  getIt.registerLazySingleton(() => LocalNotificationService());
+  getIt.registerLazySingleton(
+    () => FirebaseNotificationService(
+      getIt<LocalNotificationService>(),
+      getIt<AuthRepository>(),
+    ),
+  );
 
   // ── Feature BLoCs (factory — new instance per screen) ─────────────────────
   getIt.registerFactory(() => LoginBloc(getIt<AuthRepository>()));

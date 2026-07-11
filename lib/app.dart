@@ -6,6 +6,7 @@ import 'core/auth/auth_bloc/auth_bloc.dart';
 import 'core/auth/auth_bloc/auth_event.dart';
 import 'core/auth/auth_bloc/auth_state.dart';
 import 'core/di/injection.dart';
+import 'core/notifications/push_notification_service.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/vendor/presentation/cubit/vendor_cubit.dart';
@@ -19,6 +20,7 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   late final AppRouter _appRouter;
+  bool _pushInitialized = false;
 
   @override
   void initState() {
@@ -40,6 +42,10 @@ class _AppState extends State<App> {
         listener: (context, state) {
           if (state is AuthAuthenticated) {
             context.read<VendorCubit>().load();
+            if (!_pushInitialized) {
+              _pushInitialized = true;
+              getIt<FirebaseNotificationService>().init();
+            }
           } else if (state is AuthUnauthenticated) {
             context.read<VendorCubit>().reset();
           }
