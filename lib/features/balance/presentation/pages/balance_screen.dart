@@ -8,6 +8,7 @@ import '../../../../core/theme/app_shadows.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/di/injection.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../vendor/presentation/cubit/vendor_cubit.dart';
 import '../../../vendor/presentation/cubit/vendor_state.dart';
@@ -77,9 +78,10 @@ class BalanceScreen extends StatelessWidget {
                 ? state
                 : (state as BalanceActionError).previous;
 
-            final vendor = ctx.read<VendorCubit>().state;
-            final waveNumber =
-                vendor is VendorLoaded ? vendor.vendor.waveNumber : null;
+            final waveNumber = switch (getIt<VendorCubit>().state) {
+              VendorLoaded(:final vendor) => vendor.waveNumber,
+              _ => null,
+            };
 
             return RefreshIndicator(
               color: AppColors.gold,
@@ -94,7 +96,6 @@ class BalanceScreen extends StatelessWidget {
                 children: [
                   _BalanceHeader(
                     balance: loaded.balance.balance,
-                    currency: loaded.balance.currency,
                     onWithdraw: () => WithdrawalFormSheet.show(
                       ctx,
                       waveNumber: waveNumber,
@@ -146,12 +147,10 @@ class BalanceScreen extends StatelessWidget {
 class _BalanceHeader extends StatelessWidget {
   const _BalanceHeader({
     required this.balance,
-    required this.currency,
     required this.onWithdraw,
   });
 
   final int balance;
-  final String currency;
   final VoidCallback onWithdraw;
 
   @override
@@ -171,10 +170,10 @@ class _BalanceHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'SOLDE DISPONIBLE',
+            'Solde disponible',
             style: AppTextStyles.label.copyWith(
               color: Colors.white54,
-              letterSpacing: 0.8,
+              letterSpacing: 0.2,
             ),
           ),
           SizedBox(height: AppSpacing.xs),
@@ -193,7 +192,7 @@ class _BalanceHeader extends StatelessWidget {
               ),
               SizedBox(width: AppSpacing.xs),
               Text(
-                currency,
+                'FCFA',
                 style: AppTextStyles.body.copyWith(
                   color: Colors.white60,
                   fontWeight: FontWeight.w600,

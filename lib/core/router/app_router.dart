@@ -11,7 +11,6 @@ import '../../features/auth/presentation/pages/reset_password_screen.dart';
 import '../../features/auth/presentation/pages/pending_approval_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../features/balance/domain/repositories/balance_repository.dart';
 import '../../features/balance/presentation/cubit/balance_cubit.dart';
 import '../../features/balance/presentation/pages/balance_screen.dart';
 import '../../features/notifications/presentation/cubit/notifications_cubit.dart';
@@ -21,8 +20,6 @@ import '../../features/orders/domain/entities/vendor_order.dart';
 import '../../features/orders/presentation/cubit/orders_cubit.dart';
 import '../../features/orders/presentation/pages/order_detail_screen.dart';
 import '../../features/shell/presentation/pages/app_shell.dart';
-import '../../features/vendor/presentation/cubit/vendor_cubit.dart';
-import '../../features/vendor/presentation/cubit/vendor_state.dart';
 import '../di/injection.dart';
 import 'go_router_refresh_stream.dart';
 import 'routes.dart';
@@ -85,18 +82,8 @@ class AppRouter {
         ),
         GoRoute(
           path: Routes.balance,
-          builder: (_, _) => MultiBlocProvider(
-            providers: [
-              BlocProvider.value(value: getIt<VendorCubit>()),
-              BlocProvider(
-                create: (_) {
-                  final vs = getIt<VendorCubit>().state;
-                  final cubit = BalanceCubit(getIt<BalanceRepository>());
-                  if (vs is VendorLoaded) cubit.load(vs.vendor.id);
-                  return cubit;
-                },
-              ),
-            ],
+          builder: (_, _) => BlocProvider.value(
+            value: getIt<BalanceCubit>(),
             child: const BalanceScreen(),
           ),
         ),

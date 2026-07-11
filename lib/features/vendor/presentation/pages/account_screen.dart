@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../core/auth/auth_bloc/auth_bloc.dart';
+import '../../../../core/auth/auth_bloc/auth_event.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
@@ -36,11 +38,54 @@ class AccountScreen extends StatelessWidget {
 class _AccountBody extends StatelessWidget {
   const _AccountBody();
 
+  Future<void> _confirmLogout(BuildContext context) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.white,
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.card),
+        title: Text(
+          'Se déconnecter ?',
+          style: AppTextStyles.h2.copyWith(color: AppColors.ink),
+        ),
+        content: Text(
+          'Vous serez redirigé vers l\'écran de connexion.',
+          style: AppTextStyles.body.copyWith(color: AppColors.mute),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(
+              'Annuler',
+              style: AppTextStyles.body.copyWith(color: AppColors.mute),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(
+              'Se déconnecter',
+              style: AppTextStyles.body.copyWith(
+                color: AppColors.dangerText,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && context.mounted) {
+      getIt<AuthBloc>().add(const AuthLogoutRequested());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<AccountCubit, AccountState>(
       listener: (ctx, state) {
-        if (state is AccountError) {
+        if (state is AccountSuccess) {
+          AppToast.show(ctx, 'Modifications enregistrées');
+          ctx.read<AccountCubit>().reset();
+        } else if (state is AccountError) {
           AppToast.show(ctx, state.message, isError: true);
           ctx.read<AccountCubit>().reset();
         }
@@ -110,7 +155,7 @@ class _AccountBody extends StatelessWidget {
                     icon: Icons.logout_rounded,
                     label: 'Se déconnecter',
                     color: AppColors.dangerText,
-                    onTap: () => ctx.read<VendorCubit>().reset(),
+                    onTap: () => _confirmLogout(ctx),
                   ),
                 ],
               );
@@ -370,33 +415,54 @@ class _EditProfileSheetState extends State<_EditProfileSheet> {
     super.dispose();
   }
 
+  Future<void> _pickTime(TextEditingController ctrl) async {
+    final initial = _parseTime(ctrl.text) ?? TimeOfDay.now();
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: initial,
+      builder: (ctx, child) => MediaQuery(
+        data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: true),
+        child: child!,
+      ),
+    );
+    if (picked == null) return;
+    ctrl.text =
+        '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+  }
+
+  TimeOfDay? _parseTime(String text) {
+    final parts = text.split(':');
+    if (parts.length != 2) return null;
+    final h = int.tryParse(parts[0]);
+    final m = int.tryParse(parts[1]);
+    if (h == null || m == null) return null;
+    return TimeOfDay(hour: h, minute: m);
+  }
+
   Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
+    final cubit = context.read<AccountCubit>();
     final v = widget.vendor;
-    await context.read<AccountCubit>().updateProfile(
-          v.id,
-          shopName:
-              _shopName.text.trim() != v.shopName ? _shopName.text.trim() : null,
-          waveNumber:
-              _wave.text.trim().isNotEmpty ? _wave.text.trim() : null,
-          openingTime:
-              _opening.text.trim().isNotEmpty ? _opening.text.trim() : null,
-          closingTime:
-              _closing.text.trim().isNotEmpty ? _closing.text.trim() : null,
-        );
-    if (mounted) Navigator.of(context).pop();
+    await cubit.updateProfile(
+      v.id,
+      shopName:
+          _shopName.text.trim().isNotEmpty ? _shopName.text.trim() : null,
+      waveNumber:
+          _wave.text.trim().isNotEmpty ? _wave.text.trim() : null,
+      openingTime:
+          _opening.text.trim().isNotEmpty ? _opening.text.trim() : null,
+      closingTime:
+          _closing.text.trim().isNotEmpty ? _closing.text.trim() : null,
+    );
+    if (mounted && cubit.state is AccountSuccess) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final bottom = MediaQuery.viewInsetsOf(context).bottom;
-    return BlocListener<AccountCubit, AccountState>(
-      listener: (_, state) {
-        if ((state is AccountSuccess || state is AccountError) && mounted) {
-          Navigator.of(context).pop();
-        }
-      },
-      child: _SheetScaffold(
+    return _SheetScaffold(
         title: 'Modifier le profil',
         bottom: bottom,
         child: Form(
@@ -420,18 +486,20 @@ class _EditProfileSheetState extends State<_EditProfileSheet> {
               Row(
                 children: [
                   Expanded(
-                    child: _SheetField(
+                    child: _TimeField(
                       controller: _opening,
                       label: 'Ouverture',
                       hint: '08:00',
+                      onTap: () => _pickTime(_opening),
                     ),
                   ),
                   SizedBox(width: AppSpacing.sm),
                   Expanded(
-                    child: _SheetField(
+                    child: _TimeField(
                       controller: _closing,
                       label: 'Fermeture',
                       hint: '17:00',
+                      onTap: () => _pickTime(_closing),
                     ),
                   ),
                 ],
@@ -447,7 +515,6 @@ class _EditProfileSheetState extends State<_EditProfileSheet> {
             ],
           ),
         ),
-      ),
     );
   }
 }
@@ -491,23 +558,20 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
 
   Future<void> _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    await context.read<AccountCubit>().changePassword(
-          currentPassword: _current.text,
-          newPassword: _newPw.text,
-        );
-    if (mounted) Navigator.of(context).pop();
+    final cubit = context.read<AccountCubit>();
+    await cubit.changePassword(
+      currentPassword: _current.text,
+      newPassword: _newPw.text,
+    );
+    if (mounted && cubit.state is AccountSuccess) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final bottom = MediaQuery.viewInsetsOf(context).bottom;
-    return BlocListener<AccountCubit, AccountState>(
-      listener: (_, state) {
-        if ((state is AccountSuccess || state is AccountError) && mounted) {
-          Navigator.of(context).pop();
-        }
-      },
-      child: _SheetScaffold(
+    return _SheetScaffold(
         title: 'Changer le mot de passe',
         bottom: bottom,
         child: Form(
@@ -570,7 +634,66 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
             ],
           ),
         ),
-      ),
+    );
+  }
+}
+
+// ── Time picker field ─────────────────────────────────────────────────────────
+
+class _TimeField extends StatelessWidget {
+  const _TimeField({
+    required this.controller,
+    required this.label,
+    required this.hint,
+    required this.onTap,
+  });
+
+  final TextEditingController controller;
+  final String label;
+  final String hint;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: AppTextStyles.label.copyWith(color: AppColors.ink)),
+        const SizedBox(height: 6),
+        ValueListenableBuilder<TextEditingValue>(
+          valueListenable: controller,
+          builder: (_, value, __) => GestureDetector(
+            onTap: onTap,
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.inputVertical,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.paper,
+                borderRadius: AppRadius.sm,
+                border: Border.all(color: AppColors.line),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      value.text.isEmpty ? hint : value.text,
+                      style: AppTextStyles.body.copyWith(
+                        color: value.text.isEmpty
+                            ? AppColors.mute
+                            : AppColors.ink,
+                      ),
+                    ),
+                  ),
+                  const Icon(Icons.schedule_outlined,
+                      color: AppColors.mute, size: 16),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -2,15 +2,56 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../vendor/presentation/cubit/vendor_cubit.dart';
 import '../../../vendor/presentation/cubit/vendor_state.dart';
+import '../../domain/entities/vendor_order.dart';
 import '../cubit/orders_cubit.dart';
 import '../cubit/orders_state.dart';
 import '../widgets/order_list.dart';
 import '../widgets/order_tab_bar.dart';
 import '../widgets/orders_error_state.dart';
+
+// ── Day helpers ───────────────────────────────────────────────────────────────
+
+const _weekdaysShort = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+const _months = [
+  'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin',
+  'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc',
+];
+
+DateTime _orderDay(VendorOrder order) {
+  if (order.scheduledFor != null) {
+    final parsed = DateTime.tryParse(order.scheduledFor!);
+    if (parsed != null) return DateUtils.dateOnly(parsed.toLocal());
+  }
+  return DateUtils.dateOnly(order.createdAt.toLocal());
+}
+
+String _chipLabel(DateTime date) {
+  final today = DateUtils.dateOnly(DateTime.now());
+  if (date == today) return "Auj.";
+  if (date == today.subtract(const Duration(days: 1))) return 'Hier';
+  if (date == today.add(const Duration(days: 1))) return 'Demain';
+  return '${_weekdaysShort[date.weekday - 1]} ${date.day} ${_months[date.month - 1]}';
+}
+
+List<DateTime> _uniqueDays(OrdersLoaded loaded) {
+  final days = <DateTime>{};
+  for (final o in [...loaded.pending, ...loaded.validated, ...loaded.completed]) {
+    days.add(_orderDay(o));
+  }
+  return days.toList()..sort();
+}
+
+List<VendorOrder> _filterByDay(List<VendorOrder> orders, DateTime? day) {
+  if (day == null) return orders;
+  return orders.where((o) => _orderDay(o) == day).toList();
+}
+
+// ── Screen ────────────────────────────────────────────────────────────────────
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -22,6 +63,7 @@ class OrdersScreen extends StatefulWidget {
 class _OrdersScreenState extends State<OrdersScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabs;
+  DateTime? _selectedDay;
 
   @override
   void initState() {
@@ -91,31 +133,125 @@ class _OrdersScreenState extends State<OrdersScreen>
                 ? state
                 : (state as OrdersActionError).previous;
 
-            return TabBarView(
-              controller: _tabs,
+            final days = _uniqueDays(loaded);
+
+            return Column(
               children: [
-                OrderList(
-                  orders: loaded.pending,
-                  emptyLabel: 'Aucune commande en attente',
-                  emptyIcon: Icons.inbox_outlined,
-                  actionOrderId: loaded.actionOrderId,
-                  onRefresh: () => context.read<OrdersCubit>().refresh(),
-                ),
-                OrderList(
-                  orders: loaded.validated,
-                  emptyLabel: 'Aucune commande validée',
-                  emptyIcon: Icons.check_circle_outline_rounded,
-                  onRefresh: () => context.read<OrdersCubit>().refresh(),
-                ),
-                OrderList(
-                  orders: loaded.completed,
-                  emptyLabel: 'Aucune commande terminée',
-                  emptyIcon: Icons.history_rounded,
-                  onRefresh: () => context.read<OrdersCubit>().refresh(),
+                if (days.isNotEmpty)
+                  _DayFilterBar(
+                    days: days,
+                    selected: _selectedDay,
+                    onSelect: (d) => setState(() => _selectedDay = d),
+                  ),
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabs,
+                    children: [
+                      OrderList(
+                        orders: _filterByDay(loaded.pending, _selectedDay),
+                        emptyLabel: 'Aucune commande en attente',
+                        emptyIcon: Icons.inbox_outlined,
+                        actionOrderId: loaded.actionOrderId,
+                        onRefresh: () => context.read<OrdersCubit>().refresh(),
+                      ),
+                      OrderList(
+                        orders: _filterByDay(loaded.validated, _selectedDay),
+                        emptyLabel: 'Aucune commande validée',
+                        emptyIcon: Icons.check_circle_outline_rounded,
+                        onRefresh: () => context.read<OrdersCubit>().refresh(),
+                      ),
+                      OrderList(
+                        orders: _filterByDay(loaded.completed, _selectedDay),
+                        emptyLabel: 'Aucune commande terminée',
+                        emptyIcon: Icons.history_rounded,
+                        onRefresh: () => context.read<OrdersCubit>().refresh(),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+// ── Day filter bar ────────────────────────────────────────────────────────────
+
+class _DayFilterBar extends StatelessWidget {
+  const _DayFilterBar({
+    required this.days,
+    required this.selected,
+    required this.onSelect,
+  });
+
+  final List<DateTime> days;
+  final DateTime? selected;
+  final ValueChanged<DateTime?> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: AppColors.paper,
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            _Chip(
+              label: 'Tous',
+              active: selected == null,
+              onTap: () => onSelect(null),
+            ),
+            const SizedBox(width: 8),
+            ...days.map((day) => Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: _Chip(
+                    label: _chipLabel(day),
+                    active: selected == day,
+                    onTap: () => onSelect(selected == day ? null : day),
+                  ),
+                )),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Chip extends StatelessWidget {
+  const _Chip({
+    required this.label,
+    required this.active,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool active;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        decoration: BoxDecoration(
+          color: active ? AppColors.maroon : AppColors.white,
+          borderRadius: AppRadius.pill,
+          border: Border.all(
+            color: active ? AppColors.maroon : AppColors.line,
+          ),
+        ),
+        child: Text(
+          label,
+          style: AppTextStyles.label.copyWith(
+            color: active ? AppColors.white : AppColors.ink,
+            fontSize: 12.5,
+          ),
         ),
       ),
     );

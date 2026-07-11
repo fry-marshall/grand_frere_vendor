@@ -39,12 +39,12 @@ class BalanceCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'SOLDE WALLET',
+                  'Solde du portefeuille',
                   style: AppTextStyles.body.copyWith(
                     color: Colors.white54,
                     fontSize: 10.5,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.8,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.2,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -63,7 +63,7 @@ class BalanceCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      balance.currency,
+                      'FCFA',
                       style: AppTextStyles.body.copyWith(
                         color: Colors.white60,
                         fontSize: 13,

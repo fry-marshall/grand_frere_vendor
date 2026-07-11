@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_shadows.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
@@ -14,40 +15,101 @@ class CashinSuccessView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.xl),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Spacer(),
-          _SuccessIcon(),
-          SizedBox(height: AppSpacing.xl),
-          Text(
-            'Encaissement réussi !',
-            style: AppTextStyles.h1.copyWith(color: AppColors.maroon),
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(height: AppSpacing.xs),
-          RichText(
-            textAlign: TextAlign.center,
-            text: TextSpan(
-              style: AppTextStyles.body.copyWith(color: AppColors.mute),
-              children: [
-                TextSpan(
-                  text: '${formatXof(order.totalAmount)} FCFA ',
-                  style: AppTextStyles.cardBalance.copyWith(color: AppColors.maroon),
-                ),
-                const TextSpan(text: 'reçus\nde '),
-                TextSpan(
-                  text: order.studentFullName,
-                  style: const TextStyle(fontWeight: FontWeight.w700),
-                ),
-              ],
+    final bottomPad = MediaQuery.paddingOf(context).bottom;
+
+    return Scaffold(
+      backgroundColor: AppColors.paper,
+      body: Padding(
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          0,
+          AppSpacing.lg,
+          AppSpacing.xl + bottomPad,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Spacer(),
+            // ── Icon ──────────────────────────────────────────────────
+            Center(child: _SuccessIcon()),
+            SizedBox(height: AppSpacing.xl),
+
+            // ── Message ───────────────────────────────────────────────
+            Text(
+              'Encaissement réussi !',
+              style: AppTextStyles.h1.copyWith(color: AppColors.maroon),
+              textAlign: TextAlign.center,
             ),
-          ),
-          const Spacer(),
-          _DoneButton(),
-        ],
+            SizedBox(height: AppSpacing.xs),
+            RichText(
+              textAlign: TextAlign.center,
+              text: TextSpan(
+                style: AppTextStyles.body.copyWith(color: AppColors.mute),
+                children: [
+                  TextSpan(
+                    text: '${formatXof(order.totalAmount)} FCFA ',
+                    style:
+                        AppTextStyles.h3.copyWith(color: AppColors.maroon),
+                  ),
+                  const TextSpan(text: 'encaissés\nauprès de '),
+                  TextSpan(
+                    text: order.studentFullName,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: AppSpacing.xl),
+
+            // ── Summary pill ──────────────────────────────────────────
+            Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 18, vertical: 10),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: AppRadius.pill,
+                  boxShadow: AppShadows.xs,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.receipt_rounded,
+                        color: AppColors.gold, size: 16),
+                    const SizedBox(width: 8),
+                    Text(
+                      '#${order.shortCode ?? order.id.substring(0, 6).toUpperCase()} · ${order.items.length} article${order.items.length > 1 ? 's' : ''}',
+                      style: AppTextStyles.label
+                          .copyWith(color: AppColors.ink),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const Spacer(),
+
+            // ── CTA ───────────────────────────────────────────────────
+            GestureDetector(
+              onTap: () => context.pop(),
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                    vertical: AppSpacing.buttonVertical),
+                decoration: BoxDecoration(
+                  color: AppColors.maroon,
+                  borderRadius: AppRadius.pill,
+                  boxShadow: AppShadows.md,
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  "Retour à l'accueil",
+                  style: AppTextStyles.buttonLabel
+                      .copyWith(color: AppColors.white),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -75,28 +137,6 @@ class _SuccessIcon extends StatelessWidget {
         ],
       ),
       child: const Icon(Icons.check_rounded, color: Colors.white, size: 46),
-    );
-  }
-}
-
-class _DoneButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => context.pop(),
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: AppSpacing.buttonVertical),
-        decoration: BoxDecoration(
-          color: AppColors.maroon,
-          borderRadius: AppRadius.md,
-        ),
-        child: Text(
-          "Retour à l'accueil",
-          textAlign: TextAlign.center,
-          style: AppTextStyles.buttonLabel.copyWith(color: AppColors.white),
-        ),
-      ),
     );
   }
 }

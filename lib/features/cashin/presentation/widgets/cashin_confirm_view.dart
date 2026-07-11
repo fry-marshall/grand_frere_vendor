@@ -26,6 +26,8 @@ class CashinConfirmView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bottomPad = MediaQuery.paddingOf(context).bottom;
+
     return Scaffold(
       backgroundColor: AppColors.paper,
       appBar: AppBar(
@@ -41,87 +43,79 @@ class CashinConfirmView extends StatelessWidget {
           onPressed: isSubmitting ? null : onCancel,
         ),
         title: Text(
-          "Confirmer l'encaissement",
+          'Confirmation',
           style: AppTextStyles.h3.copyWith(color: AppColors.maroon),
         ),
       ),
       body: Stack(
         children: [
-          _ConfirmBody(order: order, isSubmitting: isSubmitting, onCancel: onCancel),
-          if (isSubmitting)
-            const ColoredBox(
-              color: Color(0x33000000),
-              child: Center(child: CircularProgressIndicator(color: AppColors.gold)),
+          SingleChildScrollView(
+            padding: EdgeInsets.fromLTRB(
+              AppSpacing.md,
+              AppSpacing.xs,
+              AppSpacing.md,
+              120 + bottomPad,
             ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ConfirmBody extends StatelessWidget {
-  const _ConfirmBody({
-    required this.order,
-    required this.isSubmitting,
-    required this.onCancel,
-  });
-
-  final Order order;
-  final bool isSubmitting;
-  final VoidCallback onCancel;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _RecognizedChip(),
-        Expanded(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // ── Validated badge ────────────────────────────────────
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.successSurface,
+                      borderRadius: AppRadius.pill,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.verified_rounded,
+                            color: AppColors.success, size: 15),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Carte Grand-Frère reconnue',
+                          style: AppTextStyles.label.copyWith(
+                              color: AppColors.successText),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 SizedBox(height: AppSpacing.md),
+
+                // ── Student card ────────────────────────────────────────
                 _StudentCard(order: order),
                 SizedBox(height: AppSpacing.md),
-                _OrderCard(order: order),
+
+                // ── Order receipt ───────────────────────────────────────
+                _ReceiptCard(order: order),
               ],
             ),
           ),
-        ),
-        _BottomActions(order: order, isSubmitting: isSubmitting, onCancel: onCancel),
-      ],
-    );
-  }
-}
 
-class _RecognizedChip extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.micro,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.successSurface,
-              borderRadius: AppRadius.pill,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.check_rounded, color: AppColors.success, size: 14),
-                SizedBox(width: AppSpacing.micro),
-                Text(
-                  'Carte GF reconnue',
-                  style: AppTextStyles.buttonSmall.copyWith(color: AppColors.successText),
+          // ── Loading overlay ─────────────────────────────────────────
+          if (isSubmitting)
+            const Positioned.fill(
+              child: ColoredBox(
+                color: Color(0x44000000),
+                child: Center(
+                  child: CircularProgressIndicator(color: AppColors.gold),
                 ),
-              ],
+              ),
+            ),
+
+          // ── Bottom CTA ──────────────────────────────────────────────
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: _BottomBar(
+              order: order,
+              isSubmitting: isSubmitting,
+              onCancel: onCancel,
+              bottomPad: bottomPad,
             ),
           ),
         ],
@@ -129,6 +123,8 @@ class _RecognizedChip extends StatelessWidget {
     );
   }
 }
+
+// ── Student card ──────────────────────────────────────────────────────────────
 
 class _StudentCard extends StatelessWidget {
   const _StudentCard({required this.order});
@@ -144,19 +140,20 @@ class _StudentCard extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: AppRadius.md,
+        borderRadius: AppRadius.card,
         boxShadow: AppShadows.violetCard,
       ),
       child: Row(
         children: [
           Container(
-            width: 56,
-            height: 56,
+            width: 52,
+            height: 52,
             decoration: BoxDecoration(
-              color: Colors.white.withAlpha(30),
+              color: Colors.white.withAlpha(28),
               borderRadius: AppRadius.sm,
             ),
-            child: const Icon(Icons.qr_code_rounded, color: Colors.white, size: 32),
+            child: const Icon(Icons.person_rounded,
+                color: Colors.white, size: 28),
           ),
           SizedBox(width: AppSpacing.md),
           Expanded(
@@ -166,20 +163,55 @@ class _StudentCard extends StatelessWidget {
                 Text(
                   'CARTE GRAND-FRÈRE',
                   style: AppTextStyles.label.copyWith(
-                    color: Colors.white.withAlpha(200),
+                    color: Colors.white.withAlpha(180),
+                    fontSize: 10,
+                    letterSpacing: 1,
                   ),
                 ),
+                const SizedBox(height: 2),
                 Text(
                   order.studentFullName,
                   style: AppTextStyles.h2.copyWith(color: Colors.white),
                 ),
-                if (order.shortCode != null)
+                if (order.shortCode != null) ...[
+                  const SizedBox(height: 2),
                   Text(
                     '#${order.shortCode}',
                     style: AppTextStyles.caption.copyWith(
-                      color: Colors.white.withAlpha(180),
+                      color: Colors.white.withAlpha(160),
                     ),
                   ),
+                ],
+              ],
+            ),
+          ),
+          // Payment method pill
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: Colors.white.withAlpha(28),
+              borderRadius: AppRadius.pill,
+              border:
+                  Border.all(color: Colors.white.withAlpha(50), width: 1),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  order.isCash
+                      ? Icons.payments_outlined
+                      : Icons.account_balance_wallet_outlined,
+                  color: Colors.white,
+                  size: 13,
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  order.isCash ? 'Cash' : 'Wave',
+                  style: AppTextStyles.label.copyWith(
+                    color: Colors.white,
+                    fontSize: 11,
+                  ),
+                ),
               ],
             ),
           ),
@@ -189,12 +221,15 @@ class _StudentCard extends StatelessWidget {
   }
 }
 
-class _OrderCard extends StatelessWidget {
-  const _OrderCard({required this.order});
+// ── Receipt card ──────────────────────────────────────────────────────────────
+
+class _ReceiptCard extends StatelessWidget {
+  const _ReceiptCard({required this.order});
   final Order order;
 
   String _timeAgo() {
     final diff = DateTime.now().difference(order.createdAt);
+    if (diff.inMinutes < 1) return 'à l\'instant';
     if (diff.inMinutes < 60) return 'il y a ${diff.inMinutes} min';
     if (diff.inHours < 24) return 'il y a ${diff.inHours} h';
     return 'il y a ${diff.inDays} j';
@@ -203,46 +238,103 @@ class _OrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: AppRadius.md,
+        borderRadius: AppRadius.card,
         boxShadow: AppShadows.sm,
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Commande #${order.shortCode ?? order.id.substring(0, 6)}',
-                style: AppTextStyles.h3.copyWith(color: AppColors.ink),
-              ),
-              Text(
-                _timeAgo(),
-                style: AppTextStyles.caption.copyWith(color: AppColors.mute),
-              ),
-            ],
+          // Header
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              AppSpacing.md,
+              AppSpacing.md,
+              AppSpacing.md,
+              AppSpacing.sm,
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: AppColors.goldSoft,
+                    borderRadius: AppRadius.sm,
+                  ),
+                  child: const Icon(Icons.receipt_long_rounded,
+                      color: AppColors.gold, size: 20),
+                ),
+                SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Commande #${order.shortCode ?? order.id.substring(0, 6).toUpperCase()}',
+                        style: AppTextStyles.cardTitle
+                            .copyWith(color: AppColors.ink),
+                      ),
+                      Text(
+                        _timeAgo(),
+                        style: AppTextStyles.caption
+                            .copyWith(color: AppColors.mute),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.successSurface,
+                    borderRadius: AppRadius.pill,
+                  ),
+                  child: Text(
+                    '${order.items.length} article${order.items.length > 1 ? 's' : ''}',
+                    style: AppTextStyles.label.copyWith(
+                      color: AppColors.successText,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-          SizedBox(height: AppSpacing.sm),
-          const Divider(color: AppColors.line, height: 1),
-          SizedBox(height: AppSpacing.sm),
-          ...order.items.map((item) => _ItemRow(item: item)),
-          const Divider(color: AppColors.line, height: 1),
-          SizedBox(height: AppSpacing.sm),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Total à débiter',
-                style: AppTextStyles.body.copyWith(color: AppColors.mute),
-              ),
-              Text(
-                '${formatXof(order.totalAmount)} FCFA',
-                style: AppTextStyles.cardBalance.copyWith(color: AppColors.maroon),
-              ),
-            ],
+          const Divider(color: AppColors.line, height: 1, indent: 16, endIndent: 16),
+
+          // Items
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
+            child: Column(
+              children: order.items
+                  .map((item) => _ItemRow(item: item))
+                  .toList(),
+            ),
+          ),
+          const Divider(color: AppColors.line, height: 1, indent: 16, endIndent: 16),
+
+          // Total
+          Padding(
+            padding: EdgeInsets.all(AppSpacing.md),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Total à encaisser',
+                  style:
+                      AppTextStyles.body.copyWith(color: AppColors.mute),
+                ),
+                Text(
+                  '${formatXof(order.totalAmount)} FCFA',
+                  style: AppTextStyles.h2.copyWith(color: AppColors.maroon),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -257,9 +349,26 @@ class _ItemRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: AppSpacing.xs),
+      padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
+          Container(
+            width: 26,
+            height: 26,
+            decoration: BoxDecoration(
+              color: AppColors.cream,
+              borderRadius: AppRadius.xs,
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              '×${item.quantity}',
+              style: AppTextStyles.label.copyWith(
+                color: AppColors.brown,
+                fontSize: 11,
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               item.name,
@@ -279,48 +388,72 @@ class _ItemRow extends StatelessWidget {
   }
 }
 
-class _BottomActions extends StatelessWidget {
-  const _BottomActions({
+// ── Bottom CTA ────────────────────────────────────────────────────────────────
+
+class _BottomBar extends StatelessWidget {
+  const _BottomBar({
     required this.order,
     required this.isSubmitting,
     required this.onCancel,
+    required this.bottomPad,
   });
 
   final Order order;
   final bool isSubmitting;
   final VoidCallback onCancel;
+  final double bottomPad;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
       padding: EdgeInsets.fromLTRB(
         AppSpacing.md,
-        AppSpacing.xs,
+        AppSpacing.sm,
         AppSpacing.md,
-        AppSpacing.xl,
+        AppSpacing.sm + bottomPad,
+      ),
+      decoration: const BoxDecoration(
+        color: AppColors.white,
+        border: Border(top: BorderSide(color: AppColors.line)),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           BlocBuilder<CashinCubit, CashinState>(
             builder: (ctx, _) => GestureDetector(
               onTap: isSubmitting
                   ? null
                   : () => ctx.read<CashinCubit>().completeOrder(order),
-              child: Container(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
                 width: double.infinity,
-                padding: EdgeInsets.symmetric(vertical: AppSpacing.buttonVertical),
+                padding: EdgeInsets.symmetric(
+                    vertical: AppSpacing.buttonVertical),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppColors.gold, AppColors.goldDeep],
-                  ),
+                  gradient: isSubmitting
+                      ? null
+                      : const LinearGradient(
+                          colors: [AppColors.gold, AppColors.goldDeep],
+                        ),
+                  color: isSubmitting ? AppColors.line : null,
                   borderRadius: AppRadius.pill,
-                  boxShadow: AppShadows.md,
+                  boxShadow: isSubmitting ? null : AppShadows.button,
                 ),
                 alignment: Alignment.center,
-                child: Text(
-                  'Encaisser ${formatXof(order.totalAmount)} FCFA',
-                  style: AppTextStyles.buttonLabel.copyWith(color: Colors.white),
-                ),
+                child: isSubmitting
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: AppColors.gold,
+                        ),
+                      )
+                    : Text(
+                        'Encaisser ${formatXof(order.totalAmount)} FCFA',
+                        style: AppTextStyles.buttonLabel
+                            .copyWith(color: Colors.white),
+                      ),
               ),
             ),
           ),

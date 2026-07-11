@@ -11,7 +11,7 @@ import '../../domain/entities/vendor_item.dart';
 import '../cubit/items_cubit.dart';
 import '../cubit/items_state.dart';
 import '../widgets/item_card.dart';
-import '../widgets/item_form_sheet.dart';
+import 'item_form_page.dart';
 
 class MenuScreen extends StatelessWidget {
   const MenuScreen({super.key});
@@ -50,7 +50,7 @@ class MenuScreen extends StatelessWidget {
           actions: [
             IconButton(
               icon: const Icon(Icons.add_rounded, color: AppColors.maroon, size: 26),
-              onPressed: () => ItemFormSheet.show(context),
+              onPressed: () => ItemFormPage.push(context),
             ),
           ],
         ),
@@ -75,7 +75,7 @@ class MenuScreen extends StatelessWidget {
 
             if (loaded.items.isEmpty) {
               return _EmptyState(
-                onAdd: () => ItemFormSheet.show(context),
+                onAdd: () => ItemFormPage.push(context),
               );
             }
 
@@ -101,7 +101,7 @@ class MenuScreen extends StatelessWidget {
                       (item) => ItemCard(
                         item: item,
                         isActing: loaded.actionItemId == item.id,
-                        onEdit: () => ItemFormSheet.show(context, item: item),
+                        onEdit: () => ItemFormPage.push(context, item: item),
                         onImageTap: () => _pickAndUpload(context, item),
                       ),
                     ),
@@ -118,7 +118,7 @@ class MenuScreen extends StatelessWidget {
                       (item) => ItemCard(
                         item: item,
                         isActing: loaded.actionItemId == item.id,
-                        onEdit: () => ItemFormSheet.show(context, item: item),
+                        onEdit: () => ItemFormPage.push(context, item: item),
                         onImageTap: () => _pickAndUpload(context, item),
                       ),
                     ),

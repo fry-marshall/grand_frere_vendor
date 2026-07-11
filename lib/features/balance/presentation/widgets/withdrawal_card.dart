@@ -75,7 +75,7 @@ class WithdrawalCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  withdrawal.waveNumber,
+                  withdrawal.waveNumber ?? '—',
                   style: AppTextStyles.body.copyWith(color: AppColors.ink),
                 ),
                 Text(
@@ -89,7 +89,7 @@ class WithdrawalCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '-${formatXof(withdrawal.amount)} ${withdrawal.currency}',
+                '-${formatXof(withdrawal.amount)} FCFA',
                 style: AppTextStyles.h3.copyWith(color: AppColors.ink),
               ),
               SizedBox(height: AppSpacing.micro),

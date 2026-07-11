@@ -16,6 +16,10 @@ class ForbiddenFailure extends Failure {
   const ForbiddenFailure() : super('Access denied');
 }
 
+class UnauthorizedFailure extends Failure {
+  const UnauthorizedFailure(super.message);
+}
+
 class ServerFailure extends Failure {
   const ServerFailure(super.message);
 }

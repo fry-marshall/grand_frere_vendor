@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/di/injection.dart';
 import '../../../../core/widgets/app_toast.dart';
+import '../../../balance/presentation/cubit/balance_cubit.dart';
+import '../../../orders/presentation/cubit/orders_cubit.dart';
 import '../cubit/cashin_cubit.dart';
 import '../cubit/cashin_state.dart';
 import '../widgets/cashin_code_view.dart';
@@ -46,9 +48,15 @@ class _CashinOrchestratorState extends State<_CashinOrchestrator> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<CashinCubit, CashinState>(
-      listenWhen: (_, s) => s is CashinError,
+      listenWhen: (_, s) => s is CashinError || s is CashinCompleted,
       listener: (ctx, state) {
-        if (state is CashinError) AppToast.show(ctx, state.message, isError: true);
+        if (state is CashinError) {
+          AppToast.show(ctx, state.message, isError: true);
+        }
+        if (state is CashinCompleted) {
+          getIt<OrdersCubit>().refresh();
+          getIt<BalanceCubit>().refresh();
+        }
       },
       child: BlocBuilder<CashinCubit, CashinState>(
         builder: (_, state) {

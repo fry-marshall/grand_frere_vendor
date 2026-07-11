@@ -47,18 +47,6 @@ class OrderCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  if (order.shortCode != null) ...[
-                    Text(
-                      '#${order.shortCode}',
-                      style: AppTextStyles.mono
-                          .copyWith(color: AppColors.maroon, fontSize: 13),
-                    ),
-                    Text(
-                      ' · ',
-                      style:
-                          AppTextStyles.caption.copyWith(color: AppColors.mute),
-                    ),
-                  ],
                   Text(
                     order.studentClass,
                     style:

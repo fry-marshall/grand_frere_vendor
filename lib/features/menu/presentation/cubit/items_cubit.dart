@@ -57,6 +57,7 @@ class ItemsCubit extends Cubit<ItemsState> {
     String? name,
     int? price,
     String? description,
+    String? status,
   }) async {
     final loaded = state;
     if (loaded is! ItemsLoaded) return;
@@ -66,6 +67,7 @@ class ItemsCubit extends Cubit<ItemsState> {
       name: name,
       price: price,
       description: description,
+      status: status
     );
     result.fold(
       (f) => emit(ItemsActionError(message: f.message, previous: loaded)),
@@ -81,7 +83,7 @@ class ItemsCubit extends Cubit<ItemsState> {
     if (loaded is! ItemsLoaded) return;
     final newStatus = item.isActive ? 'INACTIVE' : 'ACTIVE';
     emit(loaded.copyWith(actionItemId: item.id));
-    final result = await _repo.updateItem(item.id, status: newStatus);
+    final result = await _repo.updateItem(item.id, name: item.name, price: item.price, status: newStatus);
     result.fold(
       (f) => emit(ItemsActionError(message: f.message, previous: loaded)),
       (updated) {

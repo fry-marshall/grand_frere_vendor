@@ -1,20 +1,20 @@
 class VendorWithdrawal {
   const VendorWithdrawal({
     required this.id,
-    required this.vendorId,
     required this.amount,
     required this.currency,
-    required this.waveNumber,
     required this.status,
     required this.createdAt,
+    this.waveNumber,
     this.paystackRef,
+    this.vendorId,
   });
 
   final String id;
-  final String vendorId;
+  final String? vendorId;
   final int amount;
   final String currency;
-  final String waveNumber;
+  final String? waveNumber;
   final String? paystackRef;
   final String status;
   final DateTime createdAt;

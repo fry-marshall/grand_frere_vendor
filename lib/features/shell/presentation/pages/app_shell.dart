@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +8,7 @@ import '../../../../core/di/injection.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../balance/presentation/cubit/balance_cubit.dart';
 import '../../../menu/presentation/cubit/items_cubit.dart';
 import '../../../menu/presentation/pages/menu_screen.dart';
 import '../../../notifications/presentation/cubit/notifications_cubit.dart';
@@ -25,6 +28,7 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> {
   int _index = 0;
+  StreamSubscription<VendorState>? _vendorSub;
 
   static const _tabs = [
     HomeScreen(),
@@ -36,14 +40,30 @@ class _AppShellState extends State<AppShell> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final vs = context.read<VendorCubit>().state;
-      if (vs is VendorLoaded) {
-        getIt<OrdersCubit>().load(vs.vendor.id);
-        getIt<ItemsCubit>().load(vs.vendor.id);
-        getIt<NotificationsCubit>().load();
-      }
+    final vendorCubit = getIt<VendorCubit>();
+
+    // Check current state immediately (vendor may already be loaded)
+    if (vendorCubit.state is VendorLoaded) {
+      _loadAll((vendorCubit.state as VendorLoaded).vendor.id);
+    }
+
+    // Also listen for future emissions (covers the race condition)
+    _vendorSub = vendorCubit.stream.listen((state) {
+      if (state is VendorLoaded) _loadAll(state.vendor.id);
     });
+  }
+
+  void _loadAll(String vendorId) {
+    getIt<OrdersCubit>().load(vendorId);
+    getIt<ItemsCubit>().load(vendorId);
+    getIt<BalanceCubit>().load(vendorId);
+    getIt<NotificationsCubit>().load();
+  }
+
+  @override
+  void dispose() {
+    _vendorSub?.cancel();
+    super.dispose();
   }
 
   @override
@@ -54,6 +74,7 @@ class _AppShellState extends State<AppShell> {
       providers: [
         BlocProvider.value(value: getIt<OrdersCubit>()),
         BlocProvider.value(value: getIt<ItemsCubit>()),
+        BlocProvider.value(value: getIt<BalanceCubit>()),
         BlocProvider.value(value: getIt<NotificationsCubit>()),
       ],
       child: Scaffold(
