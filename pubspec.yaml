@@ -35,7 +35,7 @@ dependencies:
   flutter_secure_storage: ^9.2.2
 
   # QR scanner
-  mobile_scanner: ^5.0.0
+  mobile_scanner: ^7.2.0
 
   # Image picker (upload photo article)
   image_picker: ^1.1.2
