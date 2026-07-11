@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "64757699713",
+    "project_id": "grand-frere-2bb6b",
+    "storage_bucket": "grand-frere-2bb6b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:64757699713:android:71090f1c1e98af7515a980",
+        "android_client_info": {
+          "package_name": "com.example.grand_frere_vendor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDegVRwjdsL2En9Bdbobs_KcwbTEzGbcKU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:64757699713:android:05cd6dc586c4f2b015a980",
+        "android_client_info": {
+          "package_name": "com.grandfrere.grand_frere_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDegVRwjdsL2En9Bdbobs_KcwbTEzGbcKU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:64757699713:android:38251a94bc9f065115a980",
+        "android_client_info": {
+          "package_name": "com.grandfrere.grandfrereclient"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDegVRwjdsL2En9Bdbobs_KcwbTEzGbcKU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
