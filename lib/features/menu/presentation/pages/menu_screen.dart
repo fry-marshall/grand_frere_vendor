@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,15 +19,99 @@ class MenuScreen extends StatelessWidget {
   const MenuScreen({super.key});
 
   Future<void> _pickAndUpload(BuildContext context, VendorItem item) async {
+    final source = await _pickImageSource(context);
+    if (source == null) return;
+    if (!context.mounted) return;
     final picker = ImagePicker();
     final file = await picker.pickImage(
-      source: ImageSource.gallery,
+      source: source,
       imageQuality: 80,
       maxWidth: 1024,
     );
     if (file == null) return;
     if (!context.mounted) return;
+
+    final confirmed = await _confirmImage(context, file);
+    if (confirmed != true || !context.mounted) return;
+
     await context.read<ItemsCubit>().uploadImage(item.id, file.path);
+  }
+
+  Future<bool?> _confirmImage(BuildContext context, XFile file) {
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.md),
+        title: Text(
+          'Confirmer la photo ?',
+          style: AppTextStyles.h3.copyWith(color: AppColors.ink),
+        ),
+        content: Container(
+          height: 160,
+          decoration: BoxDecoration(
+            borderRadius: AppRadius.sm,
+            border: Border.all(color: AppColors.line),
+            image: DecorationImage(
+              image: FileImage(File(file.path)),
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(
+              'Annuler',
+              style: AppTextStyles.body.copyWith(color: AppColors.mute),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(
+              'Confirmer',
+              style: AppTextStyles.body.copyWith(color: AppColors.maroon),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<ImageSource?> _pickImageSource(BuildContext context) {
+    return showModalBottomSheet<ImageSource>(
+      context: context,
+      backgroundColor: AppColors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetCtx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(height: AppSpacing.sm),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.line,
+                borderRadius: AppRadius.pill,
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined, color: AppColors.maroon),
+              title: const Text('Prendre une photo'),
+              onTap: () => Navigator.of(sheetCtx).pop(ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined, color: AppColors.maroon),
+              title: const Text('Choisir depuis la galerie'),
+              onTap: () => Navigator.of(sheetCtx).pop(ImageSource.gallery),
+            ),
+            SizedBox(height: AppSpacing.sm),
+          ],
+        ),
+      ),
+    );
   }
 
   @override

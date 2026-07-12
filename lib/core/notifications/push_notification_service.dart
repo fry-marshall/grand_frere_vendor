@@ -99,7 +99,22 @@ class FirebaseNotificationService {
   /// Fire-and-forget: registering the token isn't on the critical path,
   /// mirrors how the backend treats notification side effects.
   Future<void> _syncToken() async {
+    if (Platform.isIOS) {
+      // On iOS, FCM's getToken() calls getAPNSToken() internally, but APNS
+      // registration with Apple is async — retry until it's ready.
+      var apnsToken = await _messaging.getAPNSToken();
+      var attempts = 0;
+      while (apnsToken == null && attempts < 5) {
+        await Future.delayed(const Duration(seconds: 1));
+        apnsToken = await _messaging.getAPNSToken();
+        attempts++;
+      }
+      print(apnsToken);
+      if (apnsToken == null) return;
+    }
+
     final token = await getToken();
+    print(token);
     if (token != null) {
       await _authRepository.updateFcmToken(token);
     }
