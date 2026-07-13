@@ -63,6 +63,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '64757699713',
     projectId: 'grand-frere-2bb6b',
     storageBucket: 'grand-frere-2bb6b.firebasestorage.app',
-    iosBundleId: 'com.example.grandFrereVendor',
+    iosBundleId: 'com.grandfrere.vendor',
   );
 }
