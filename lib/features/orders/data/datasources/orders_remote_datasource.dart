@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import '../../../../core/network/api_client.dart';
 import '../models/vendor_order_model.dart';
 
@@ -28,6 +30,7 @@ class OrdersRemoteDataSourceImpl implements OrdersRemoteDataSource {
   @override
   Future<VendorOrderModel> getOrderById(String orderId) async {
     final res = await _client.get('/orders/$orderId');
+    log('getOrderById: — ${res}');
     return VendorOrderModel.fromJson(res.data['data'] as Map<String, dynamic>);
   }
 
