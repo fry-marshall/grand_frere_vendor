@@ -20,16 +20,42 @@ import '../widgets/vendor_header.dart';
 // ── Day helpers ───────────────────────────────────────────────────────────────
 
 const _weekdays = [
-  'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'
+  'Lundi',
+  'Mardi',
+  'Mercredi',
+  'Jeudi',
+  'Vendredi',
+  'Samedi',
+  'Dimanche',
 ];
 const _weekdaysShort = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 const _months = [
-  'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-  'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',
+  'Janvier',
+  'Février',
+  'Mars',
+  'Avril',
+  'Mai',
+  'Juin',
+  'Juillet',
+  'Août',
+  'Septembre',
+  'Octobre',
+  'Novembre',
+  'Décembre',
 ];
 const _monthsShort = [
-  'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin',
-  'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc',
+  'Jan',
+  'Fév',
+  'Mar',
+  'Avr',
+  'Mai',
+  'Juin',
+  'Juil',
+  'Août',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Déc',
 ];
 
 String _dayLabel(DateTime date) {
@@ -122,109 +148,119 @@ class _HomeBodyState extends State<_HomeBody> {
               ),
             ),
             Expanded(
-              child: ListView(
-                padding: EdgeInsets.fromLTRB(14, 0, 14, 110 + bottomPad),
-                children: [
-                  // ── KPIs ──────────────────────────────────────────────
-                  BlocBuilder<OrdersCubit, OrdersState>(
-                    builder: (_, ordersState) {
-                      final stats = ordersState is OrdersLoaded
-                          ? _computeStats(ordersState)
-                          : const VendorStats(
-                              todayOrderCount: 0,
-                              todayRevenue: 0,
-                              cashToCollect: 0,
-                            );
-                      return KpiRow(stats: stats);
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  // ── Balance card ───────────────────────────────────────
-                  BlocBuilder<BalanceCubit, BalanceState>(
-                    builder: (_, state) {
-                      if (state is! BalanceLoaded &&
-                          state is! BalanceActionError) {
-                        return const SizedBox.shrink();
-                      }
-                      final balance = state is BalanceLoaded
-                          ? state.balance
-                          : (state as BalanceActionError).previous.balance;
-                      return BalanceCard(balance: balance);
-                    },
-                  ),
-                  // ── Active orders ──────────────────────────────────────
-                  const SizedBox(height: 20),
-                  const DashboardSectionHeader('Commandes en cours'),
-                  const SizedBox(height: 10),
-                  BlocBuilder<OrdersCubit, OrdersState>(
-                    builder: (_, state) {
-                      if (state is OrdersInitial || state is OrdersLoading) {
-                        return const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 24),
-                          child: Center(
-                            child: CircularProgressIndicator(
-                                color: AppColors.gold),
-                          ),
-                        );
-                      }
-                      final List<VendorOrder> active;
-                      final String? actionId;
-                      if (state is OrdersLoaded) {
-                        active = [...state.pending, ...state.validated];
-                        actionId = state.actionOrderId;
-                      } else if (state is OrdersActionError) {
-                        active = [
-                          ...state.previous.pending,
-                          ...state.previous.validated,
-                        ];
-                        actionId = null;
-                      } else {
-                        active = [];
-                        actionId = null;
-                      }
-
-                      if (active.isEmpty) return const EmptyOrdersCard();
-
-                      final days = _uniqueDays(active);
-                      final filtered = _selectedDay == null
-                          ? active
-                          : active
-                              .where((o) => _orderDay(o) == _selectedDay)
-                              .toList();
-                      final grouped = _groupByDay(filtered);
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Day filter chips
-                          if (days.length > 1) ...[
-                            _DayFilterBar(
-                              days: days,
-                              selected: _selectedDay,
-                              onSelect: (d) =>
-                                  setState(() => _selectedDay = d),
-                            ),
-                            const SizedBox(height: 12),
-                          ],
-                          // Grouped orders
-                          for (final entry in grouped.entries) ...[
-                            _DayHeader(label: _dayLabel(entry.key)),
-                            const SizedBox(height: 8),
-                            for (final order in entry.value)
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 10),
-                                child: OrderCard(
-                                  order: order,
-                                  isActing: actionId == order.id,
-                                ),
+              child: RefreshIndicator(
+                color: AppColors.gold,
+                onRefresh: () => Future.wait([
+                  context.read<OrdersCubit>().refresh(),
+                  context.read<BalanceCubit>().refresh(),
+                  context.read<VendorCubit>().load(),
+                ]),
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.fromLTRB(14, 0, 14, 110 + bottomPad),
+                  children: [
+                    // ── KPIs ──────────────────────────────────────────────
+                    BlocBuilder<OrdersCubit, OrdersState>(
+                      builder: (_, ordersState) {
+                        final stats = ordersState is OrdersLoaded
+                            ? _computeStats(ordersState)
+                            : const VendorStats(
+                                todayOrderCount: 0,
+                                todayRevenue: 0,
+                                cashToCollect: 0,
+                              );
+                        return KpiRow(stats: stats);
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    // ── Balance card ───────────────────────────────────────
+                    BlocBuilder<BalanceCubit, BalanceState>(
+                      builder: (_, state) {
+                        if (state is! BalanceLoaded &&
+                            state is! BalanceActionError) {
+                          return const SizedBox.shrink();
+                        }
+                        final balance = state is BalanceLoaded
+                            ? state.balance
+                            : (state as BalanceActionError).previous.balance;
+                        return BalanceCard(balance: balance);
+                      },
+                    ),
+                    // ── Active orders ──────────────────────────────────────
+                    const SizedBox(height: 20),
+                    const DashboardSectionHeader('Commandes en cours'),
+                    const SizedBox(height: 10),
+                    BlocBuilder<OrdersCubit, OrdersState>(
+                      builder: (_, state) {
+                        if (state is OrdersInitial || state is OrdersLoading) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 24),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: AppColors.gold,
                               ),
-                            const SizedBox(height: 6),
+                            ),
+                          );
+                        }
+                        final List<VendorOrder> active;
+                        final String? actionId;
+                        if (state is OrdersLoaded) {
+                          active = [...state.pending, ...state.validated];
+                          actionId = state.actionOrderId;
+                        } else if (state is OrdersActionError) {
+                          active = [
+                            ...state.previous.pending,
+                            ...state.previous.validated,
+                          ];
+                          actionId = null;
+                        } else {
+                          active = [];
+                          actionId = null;
+                        }
+
+                        if (active.isEmpty) return const EmptyOrdersCard();
+
+                        final days = _uniqueDays(active);
+                        final filtered = _selectedDay == null
+                            ? active
+                            : active
+                                  .where((o) => _orderDay(o) == _selectedDay)
+                                  .toList();
+                        final grouped = _groupByDay(filtered);
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Day filter chips
+                            if (days.length > 1) ...[
+                              _DayFilterBar(
+                                days: days,
+                                selected: _selectedDay,
+                                onSelect: (d) =>
+                                    setState(() => _selectedDay = d),
+                              ),
+                              const SizedBox(height: 12),
+                            ],
+                            // Grouped orders
+                            for (final entry in grouped.entries) ...[
+                              _DayHeader(label: _dayLabel(entry.key)),
+                              const SizedBox(height: 8),
+                              for (final order in entry.value)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 10),
+                                  child: OrderCard(
+                                    order: order,
+                                    isActing: actionId == order.id,
+                                  ),
+                                ),
+                              const SizedBox(height: 6),
+                            ],
                           ],
-                        ],
-                      );
-                    },
-                  ),
-                ],
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -259,14 +295,16 @@ class _DayFilterBar extends StatelessWidget {
             onTap: () => onSelect(null),
           ),
           const SizedBox(width: 8),
-          ...days.map((day) => Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: _Chip(
-                  label: _chipLabel(day),
-                  active: selected == day,
-                  onTap: () => onSelect(selected == day ? null : day),
-                ),
-              )),
+          ...days.map(
+            (day) => Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: _Chip(
+                label: _chipLabel(day),
+                active: selected == day,
+                onTap: () => onSelect(selected == day ? null : day),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -274,11 +312,7 @@ class _DayFilterBar extends StatelessWidget {
 }
 
 class _Chip extends StatelessWidget {
-  const _Chip({
-    required this.label,
-    required this.active,
-    required this.onTap,
-  });
+  const _Chip({required this.label, required this.active, required this.onTap});
 
   final String label;
   final bool active;
@@ -294,9 +328,7 @@ class _Chip extends StatelessWidget {
         decoration: BoxDecoration(
           color: active ? AppColors.maroon : AppColors.white,
           borderRadius: AppRadius.pill,
-          border: Border.all(
-            color: active ? AppColors.maroon : AppColors.line,
-          ),
+          border: Border.all(color: active ? AppColors.maroon : AppColors.line),
         ),
         child: Text(
           label,

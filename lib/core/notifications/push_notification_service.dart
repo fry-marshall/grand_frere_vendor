@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io' show Platform;
 
 import 'package:firebase_core/firebase_core.dart';
@@ -15,7 +17,8 @@ import '../../features/orders/domain/repositories/orders_repository.dart';
 const _androidChannel = AndroidNotificationChannel(
   'grand_frere_channel',
   'Notifications importantes',
-  description: 'Utilisé pour les notifications de commandes et du compte vendeur.',
+  description:
+      'Utilisé pour les notifications de commandes et du compte vendeur.',
   importance: Importance.max,
 );
 
@@ -30,7 +33,9 @@ class LocalNotificationService {
         >()
         ?.createNotificationChannel(_androidChannel);
 
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
@@ -62,7 +67,13 @@ class LocalNotificationService {
           importance: Importance.max,
           priority: Priority.high,
         ),
-        iOS: DarwinNotificationDetails(),
+        // Without these, iOS silently drops the banner while the app is
+        // in the foreground — it only shows for background/terminated pushes.
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
       ),
       payload: jsonEncode(message.data),
     );
@@ -82,13 +93,17 @@ class FirebaseNotificationService {
     await _requestPermission();
     await _local.init();
 
-    await _syncToken();
-    _messaging.onTokenRefresh.listen((_) => _syncToken());
-
+    // Listeners must be registered unconditionally before anything that can
+    // fail (like the network call in _syncToken) — otherwise a token-sync
+    // error silently kills foreground display and tap handling for the rest
+    // of the session.
     FirebaseMessaging.onMessage.listen(_local.show);
     FirebaseMessaging.onMessageOpenedApp.listen(
       (message) => handleNotificationTap(message.data),
     );
+
+    unawaited(_syncToken());
+    _messaging.onTokenRefresh.listen((_) => _syncToken());
 
     final initialMessage = await _messaging.getInitialMessage();
     if (initialMessage != null) {
@@ -97,26 +112,29 @@ class FirebaseNotificationService {
   }
 
   /// Fire-and-forget: registering the token isn't on the critical path,
-  /// mirrors how the backend treats notification side effects.
+  /// mirrors how the backend treats notification side effects. Errors are
+  /// swallowed here so a token-sync failure never breaks the listeners above.
   Future<void> _syncToken() async {
-    if (Platform.isIOS) {
-      // On iOS, FCM's getToken() calls getAPNSToken() internally, but APNS
-      // registration with Apple is async — retry until it's ready.
-      var apnsToken = await _messaging.getAPNSToken();
-      var attempts = 0;
-      while (apnsToken == null && attempts < 5) {
-        await Future.delayed(const Duration(seconds: 1));
-        apnsToken = await _messaging.getAPNSToken();
-        attempts++;
+    try {
+      if (Platform.isIOS) {
+        // On iOS, FCM's getToken() calls getAPNSToken() internally, but APNS
+        // registration with Apple is async — retry until it's ready.
+        var apnsToken = await _messaging.getAPNSToken();
+        var attempts = 0;
+        while (apnsToken == null && attempts < 5) {
+          await Future.delayed(const Duration(seconds: 1));
+          apnsToken = await _messaging.getAPNSToken();
+          attempts++;
+        }
+        if (apnsToken == null) return;
       }
-      print(apnsToken);
-      if (apnsToken == null) return;
-    }
 
-    final token = await getToken();
-    print(token);
-    if (token != null) {
-      await _authRepository.updateFcmToken(token);
+      final token = await getToken();
+      if (token != null) {
+        await _authRepository.updateFcmToken(token);
+      }
+    } catch (e, st) {
+      log('Failed to sync FCM token', error: e, stackTrace: st);
     }
   }
 
@@ -140,14 +158,21 @@ Future<void> firebaseBackgroundMessageHandler(RemoteMessage message) async {
 /// the `orderId` carried in the FCM data payload; anything else (or a failed
 /// fetch) falls back to the notifications list.
 Future<void> handleNotificationTap(Map<String, dynamic> data) async {
+  log('handleNotificationTap: $data');
   final router = getIt<AppRouter>().router;
   final orderId = data['orderId'] as String?;
 
   if (data['type'] == 'ORDER_RECEIVED' && orderId != null) {
     final result = await getIt<OrdersRepository>().getOrderById(orderId);
-    final order = result.fold((_) => null, (order) => order);
+    final order = result.fold((f) {
+      log('handleNotificationTap: getOrderById failed — ${f.message}');
+      return null;
+    }, (order) => order);
     if (order != null) {
-      router.push(Routes.orderDetail, extra: order);
+      router.push(
+        Routes.orderDetail.replaceFirst(':id', order.id),
+        extra: order,
+      );
       return;
     }
   }

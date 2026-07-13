@@ -18,8 +18,10 @@ class VendorOrderModel extends VendorOrder {
   });
 
   factory VendorOrderModel.fromJson(Map<String, dynamic> json) {
-    final student = json['student'] as Map<String, dynamic>;
-    final user = student['user'] as Map<String, dynamic>;
+    // The backend omits `student` entirely when the linked user is missing
+    // (see orders.service.ts), so this can't be assumed present.
+    final student = json['student'] as Map<String, dynamic>?;
+    final user = student?['user'] as Map<String, dynamic>?;
     final itemsJson = json['items'] as List<dynamic>;
 
     return VendorOrderModel(
@@ -36,9 +38,9 @@ class VendorOrderModel extends VendorOrder {
       items: itemsJson
           .map((e) => VendorOrderItemModel.fromJson(e as Map<String, dynamic>))
           .toList(),
-      studentFirstName: user['firstName'] as String,
-      studentLastName: user['lastName'] as String,
-      studentClass: (student['class'] ?? '') as String,
+      studentFirstName: user?['firstName'] as String? ?? '',
+      studentLastName: user?['lastName'] as String? ?? '',
+      studentClass: (student?['class'] ?? '') as String,
     );
   }
 }
