@@ -63,20 +63,53 @@ class _ItemFormPageState extends State<ItemFormPage> {
   }
 
   Future<void> _pickImage() async {
+    final source = await _pickImageSource();
+    if (source == null) return;
     final file = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
+      source: source,
       imageQuality: 80,
       maxWidth: 1024,
     );
     if (file == null) return;
-    if (isEdit) {
-      if (!mounted) return;
-      setState(() => _saving = true);
-      await context.read<ItemsCubit>().uploadImage(widget.item!.id, file.path);
-      if (mounted) setState(() => _saving = false);
-    } else {
-      setState(() => _pickedImage = file);
-    }
+    if (!mounted) return;
+    setState(() => _pickedImage = file);
+  }
+
+  Future<ImageSource?> _pickImageSource() {
+    return showModalBottomSheet<ImageSource>(
+      context: context,
+      backgroundColor: AppColors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetCtx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(height: AppSpacing.sm),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.line,
+                borderRadius: AppRadius.pill,
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined, color: AppColors.maroon),
+              title: const Text('Prendre une photo'),
+              onTap: () => Navigator.of(sheetCtx).pop(ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined, color: AppColors.maroon),
+              title: const Text('Choisir depuis la galerie'),
+              onTap: () => Navigator.of(sheetCtx).pop(ImageSource.gallery),
+            ),
+            SizedBox(height: AppSpacing.sm),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _submit() async {
@@ -98,6 +131,9 @@ class _ItemFormPageState extends State<ItemFormPage> {
             : null,
         status: widget.item?.status
       );
+      if (_pickedImage != null && cubit.state is! ItemsActionError) {
+        await cubit.uploadImage(widget.item!.id, _pickedImage!.path);
+      }
     } else {
       await cubit.createItem(
         name: name,
@@ -295,7 +331,7 @@ class _ImagePicker extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Touchez pour choisir depuis la galerie',
+                    'Touchez pour prendre une photo ou en choisir une',
                     style:
                         AppTextStyles.caption.copyWith(color: AppColors.line),
                   ),
