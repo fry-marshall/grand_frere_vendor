@@ -129,6 +129,7 @@ void configureDependencies() {
   getIt.registerSingleton(ItemsCubit(getIt<ItemsRepository>()));
   getIt.registerSingleton(NotificationsCubit(getIt<NotificationsRepository>()));
   getIt.registerSingleton(BalanceCubit(getIt<BalanceRepository>()));
+  getIt.registerSingleton(DashboardCubit(getIt<VendorRepository>()));
 
   // ── Router ────────────────────────────────────────────────────────────────
   getIt.registerLazySingleton(() => AppRouter(getIt<AuthBloc>()));
@@ -149,6 +150,5 @@ void configureDependencies() {
   );
   getIt.registerFactory(() => ForgotPasswordBloc(getIt<AuthRepository>()));
   getIt.registerFactory(() => ResetPasswordBloc(getIt<AuthRepository>()));
-  getIt.registerFactory(() => DashboardCubit(getIt<VendorRepository>()));
   getIt.registerFactory(() => CashinCubit(getIt<CashinRepository>()));
 }

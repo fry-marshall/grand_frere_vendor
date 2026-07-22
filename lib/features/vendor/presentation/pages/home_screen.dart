@@ -11,6 +11,8 @@ import '../../../orders/presentation/cubit/orders_cubit.dart';
 import '../../../orders/presentation/cubit/orders_state.dart';
 import '../../../orders/presentation/widgets/order_card.dart';
 import '../../domain/entities/vendor_stats.dart';
+import '../cubit/dashboard_cubit.dart';
+import '../cubit/dashboard_state.dart';
 import '../cubit/vendor_cubit.dart';
 import '../cubit/vendor_state.dart';
 import '../widgets/balance_card.dart';
@@ -89,17 +91,6 @@ List<DateTime> _uniqueDays(List<VendorOrder> orders) {
   return days.toList()..sort();
 }
 
-VendorStats _computeStats(OrdersLoaded loaded) {
-  final active = [...loaded.pending, ...loaded.validated];
-  return VendorStats(
-    todayOrderCount: active.length,
-    todayRevenue: loaded.completed.fold(0, (s, o) => s + o.totalAmount),
-    cashToCollect: active
-        .where((o) => o.isCash)
-        .fold(0, (s, o) => s + o.totalAmount),
-  );
-}
-
 Map<DateTime, List<VendorOrder>> _groupByDay(List<VendorOrder> orders) {
   final grouped = <DateTime, List<VendorOrder>>{};
   for (final order in orders) {
@@ -150,20 +141,27 @@ class _HomeBodyState extends State<_HomeBody> {
             Expanded(
               child: RefreshIndicator(
                 color: AppColors.gold,
-                onRefresh: () => Future.wait([
-                  context.read<OrdersCubit>().refresh(),
-                  context.read<BalanceCubit>().refresh(),
-                  context.read<VendorCubit>().load(),
-                ]),
+                onRefresh: () {
+                  final vendorState = context.read<VendorCubit>().state;
+                  return Future.wait([
+                    context.read<OrdersCubit>().refresh(),
+                    context.read<BalanceCubit>().refresh(),
+                    context.read<VendorCubit>().load(),
+                    if (vendorState is VendorLoaded)
+                      context
+                          .read<DashboardCubit>()
+                          .load(vendorState.vendor.id),
+                  ]);
+                },
                 child: ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: EdgeInsets.fromLTRB(14, 0, 14, 110 + bottomPad),
                   children: [
                     // ── KPIs ──────────────────────────────────────────────
-                    BlocBuilder<OrdersCubit, OrdersState>(
-                      builder: (_, ordersState) {
-                        final stats = ordersState is OrdersLoaded
-                            ? _computeStats(ordersState)
+                    BlocBuilder<DashboardCubit, DashboardState>(
+                      builder: (_, dashboardState) {
+                        final stats = dashboardState is DashboardLoaded
+                            ? dashboardState.stats
                             : const VendorStats(
                                 todayOrderCount: 0,
                                 todayRevenue: 0,
