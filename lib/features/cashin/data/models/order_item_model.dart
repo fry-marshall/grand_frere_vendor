@@ -12,9 +12,8 @@ class OrderItemModel {
   final int unitPrice;
 
   factory OrderItemModel.fromJson(Map<String, dynamic> json) {
-    final item = json['item'] as Map<String, dynamic>;
     return OrderItemModel(
-      name: item['name'] as String,
+      name: json['name'] as String,
       quantity: json['quantity'] as int,
       unitPrice: json['unitPrice'] as int,
     );
