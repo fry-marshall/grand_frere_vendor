@@ -12,7 +12,6 @@ class VendorOrderModel extends VendorOrder {
     required super.studentFirstName,
     required super.studentLastName,
     required super.studentClass,
-    super.shortCode,
     super.scheduledFor,
     super.expiresAt,
   });
@@ -29,7 +28,6 @@ class VendorOrderModel extends VendorOrder {
       status: json['status'] as String,
       paymentMethod: json['paymentMethod'] as String,
       totalAmount: json['totalAmount'] as int,
-      shortCode: json['shortCode'] as String?,
       scheduledFor: json['scheduledFor'] as String?,
       expiresAt: json['expiresAt'] != null
           ? DateTime.parse(json['expiresAt'] as String)

@@ -11,7 +11,6 @@ class VendorOrder {
     required this.studentFirstName,
     required this.studentLastName,
     required this.studentClass,
-    this.shortCode,
     this.scheduledFor,
     this.expiresAt,
   });
@@ -25,7 +24,6 @@ class VendorOrder {
   final String studentFirstName;
   final String studentLastName;
   final String studentClass;
-  final String? shortCode;
   final String? scheduledFor;
   final DateTime? expiresAt;
 

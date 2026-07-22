@@ -246,7 +246,7 @@ class _PendingOrderItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '#${order.shortCode} · ${order.studentFirstName} $initial',
+                  '${order.studentFirstName} $initial',
                   style: AppTextStyles.cardTitle.copyWith(color: AppColors.ink),
                 ),
                 Text(

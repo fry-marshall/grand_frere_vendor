@@ -1572,7 +1572,6 @@ Liste les commandes d'un vendeur avec pagination.
         "status": "VALIDATED",
         "paymentMethod": "WALLET",
         "totalAmount": 3500,
-        "shortCode": "2841",
         "scheduledFor": "2026-06-23",
         "expiresAt": "2026-06-23T23:59:59.999Z",
         "createdAt": "2026-06-23T08:00:00.000Z",
@@ -1592,6 +1591,8 @@ Liste les commandes d'un vendeur avec pagination.
   "statusCode": 200
 }
 ```
+
+> `shortCode` n'est volontairement pas exposé ici : c'est le code que l'élève communique au vendeur pour l'encaissement (scan carte ou saisie manuelle via `GET /orders/by-card` / `GET /orders/by-code`), il ne doit pas être consultable en parcourant la liste des commandes du vendeur.
 
 **Erreurs**
 

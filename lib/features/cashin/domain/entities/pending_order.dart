@@ -1,7 +1,6 @@
 class PendingOrder {
   const PendingOrder({
     required this.id,
-    required this.shortCode,
     required this.studentFirstName,
     required this.studentLastName,
     required this.studentClass,
@@ -10,7 +9,6 @@ class PendingOrder {
   });
 
   final String id;
-  final String shortCode;
   final String studentFirstName;
   final String studentLastName;
   final String studentClass;

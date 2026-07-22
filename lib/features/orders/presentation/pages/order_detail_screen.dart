@@ -42,9 +42,7 @@ class OrderDetailScreen extends StatelessWidget {
             onPressed: () => context.pop(),
           ),
           title: Text(
-            order.shortCode != null
-                ? 'Commande #${order.shortCode}'
-                : 'Détail commande',
+            'Détail commande',
             style: AppTextStyles.h3.copyWith(color: AppColors.maroon),
           ),
         ),
