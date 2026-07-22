@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:grand_frere_vendor/core/storage/token_storage.dart';
 
 import 'core/auth/auth_bloc/auth_bloc.dart';
@@ -55,6 +56,13 @@ class _AppState extends State<App> {
           theme: AppTheme.main,
           routerConfig: _appRouter.router,
           debugShowCheckedModeBanner: false,
+          locale: const Locale('fr'),
+          supportedLocales: const [Locale('fr')],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
         ),
       ),
     );

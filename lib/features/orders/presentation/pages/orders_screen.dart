@@ -38,12 +38,12 @@ String _chipLabel(DateTime date) {
   return '${_weekdaysShort[date.weekday - 1]} ${date.day} ${_months[date.month - 1]}';
 }
 
-List<DateTime> _uniqueDays(OrdersLoaded loaded) {
-  final days = <DateTime>{};
-  for (final o in [...loaded.pending, ...loaded.validated, ...loaded.completed]) {
-    days.add(_orderDay(o));
-  }
-  return days.toList()..sort();
+List<DateTime> _currentWeekDays() {
+  final today = DateUtils.dateOnly(DateTime.now());
+  final monday = today.subtract(Duration(days: today.weekday - 1));
+  return [
+    for (var i = 0; i < 5; i++) monday.add(Duration(days: i)),
+  ].where((d) => !d.isBefore(today)).toList();
 }
 
 List<VendorOrder> _filterByDay(List<VendorOrder> orders, DateTime? day) {
@@ -133,16 +133,15 @@ class _OrdersScreenState extends State<OrdersScreen>
                 ? state
                 : (state as OrdersActionError).previous;
 
-            final days = _uniqueDays(loaded);
+            final days = _currentWeekDays();
 
             return Column(
               children: [
-                if (days.isNotEmpty)
-                  _DayFilterBar(
-                    days: days,
-                    selected: _selectedDay,
-                    onSelect: (d) => setState(() => _selectedDay = d),
-                  ),
+                _DayFilterBar(
+                  days: days,
+                  selected: _selectedDay,
+                  onSelect: (d) => setState(() => _selectedDay = d),
+                ),
                 Expanded(
                   child: TabBarView(
                     controller: _tabs,
@@ -191,31 +190,82 @@ class _DayFilterBar extends StatelessWidget {
   final DateTime? selected;
   final ValueChanged<DateTime?> onSelect;
 
+  Future<void> _pickDate(BuildContext context) async {
+    final today = DateUtils.dateOnly(DateTime.now());
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: selected ?? today,
+      firstDate: today.subtract(const Duration(days: 365)),
+      lastDate: today.add(const Duration(days: 365)),
+      selectableDayPredicate: (d) =>
+          d.weekday != DateTime.saturday && d.weekday != DateTime.sunday,
+    );
+    if (picked != null) onSelect(DateUtils.dateOnly(picked));
+  }
+
   @override
   Widget build(BuildContext context) {
+    final customDay = selected != null && !days.contains(selected)
+        ? selected
+        : null;
+
     return Container(
       color: AppColors.paper,
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            _Chip(
-              label: 'Tous',
-              active: selected == null,
-              onTap: () => onSelect(null),
-            ),
-            const SizedBox(width: 8),
-            ...days.map((day) => Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: _Chip(
-                    label: _chipLabel(day),
-                    active: selected == day,
-                    onTap: () => onSelect(selected == day ? null : day),
+      child: Row(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _Chip(
+                    label: 'Tous',
+                    active: selected == null,
+                    onTap: () => onSelect(null),
                   ),
-                )),
-          ],
-        ),
+                  const SizedBox(width: 8),
+                  ...days.map((day) => Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: _Chip(
+                          label: _chipLabel(day),
+                          active: selected == day,
+                          onTap: () => onSelect(selected == day ? null : day),
+                        ),
+                      )),
+                  if (customDay != null)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: _Chip(
+                        label: _chipLabel(customDay),
+                        active: true,
+                        onTap: () => onSelect(null),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          GestureDetector(
+            onTap: () => _pickDate(context),
+            child: Container(
+              padding: const EdgeInsets.all(9),
+              decoration: BoxDecoration(
+                color: customDay != null ? AppColors.maroon : AppColors.white,
+                borderRadius: AppRadius.pill,
+                border: Border.all(
+                  color: customDay != null ? AppColors.maroon : AppColors.line,
+                ),
+              ),
+              child: Icon(
+                Icons.calendar_month_rounded,
+                size: 18,
+                color: customDay != null ? AppColors.white : AppColors.ink,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
