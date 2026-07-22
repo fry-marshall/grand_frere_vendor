@@ -50,8 +50,9 @@ class CashinRemoteDataSourceImpl implements CashinRemoteDataSource {
     final data = res.data['data'] as Map<String, dynamic>;
     final items = data['data'] as List<dynamic>;
     return items
-        .map((e) => PendingOrderModel.fromJson(e as Map<String, dynamic>))
-        .where((m) => m.shortCode.isNotEmpty)
+        .cast<Map<String, dynamic>>()
+        .where((e) => e['status'] == 'VALIDATED')
+        .map(PendingOrderModel.fromJson)
         .toList();
   }
 }
