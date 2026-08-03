@@ -10,6 +10,7 @@ class VendorItemModel extends VendorItem {
     required super.createdAt,
     super.description,
     super.imageUrl,
+    super.pendingImageUrl,
   });
 
   factory VendorItemModel.fromJson(Map<String, dynamic> json) {
@@ -20,6 +21,7 @@ class VendorItemModel extends VendorItem {
       price: (json['price'] as num).toInt(),
       description: json['description'] as String?,
       imageUrl: json['imageUrl'] as String?,
+      pendingImageUrl: json['pendingImageUrl'] as String?,
       status: json['status'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
     );

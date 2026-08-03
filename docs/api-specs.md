@@ -1717,6 +1717,7 @@ Liste les articles avec pagination.
         "price": 1500,
         "description": "Riz blanc avec sauce graine",
         "imageUrl": "https://cdn.example.com/items/riz-sauce.jpg",
+        "pendingImageUrl": null,
         "status": "ACTIVE",
         "createdAt": "2026-06-20T10:00:00.000Z"
       }
@@ -1727,7 +1728,7 @@ Liste les articles avec pagination.
 }
 ```
 
-> `VENDOR` ne voit que ses propres articles.
+> `VENDOR` ne voit que ses propres articles. `pendingImageUrl` est non-null quand une nouvelle photo attend l'approbation d'un admin (voir `PUT /items/:id/image`).
 
 ---
 
@@ -1804,7 +1805,8 @@ Met à jour un article.
 
 #### `PUT /items/:id/image`
 
-Uploade ou remplace l'image d'un article.
+Uploade ou remplace l'image d'un article.  
+La photo n'est **pas** publiée immédiatement : elle est stockée dans `pendingImageUrl` en attente de l'approbation d'un admin. `imageUrl` (la photo actuellement visible dans le menu) reste inchangé — l'article reste commandable normalement pendant la review.
 
 **Rôles** : `SUPER_ADMIN`, `VENDOR` (propriétaire)  
 **Params** : `id`  
@@ -1816,7 +1818,7 @@ Uploade ou remplace l'image d'un article.
 |---|---|---|
 | `file` | `binary` | oui |
 
-**Réponse 200** : `ItemResponseDto` avec `imageUrl` mis à jour
+**Réponse 200** : `ItemResponseDto` avec `pendingImageUrl` renseigné
 
 **Erreurs**
 
@@ -1825,6 +1827,46 @@ Uploade ou remplace l'image d'un article.
 | `400` | File validation failed (type/taille invalide) |
 | `403` | Access denied |
 | `404` | `Item not found` |
+
+**Edge case** : un nouvel upload avant qu'un admin n'ait statué sur le précédent remplace simplement la photo en attente (l'ancienne photo en attente est supprimée du storage).
+
+---
+
+#### `PUT /items/:id/image/approve`
+
+Approuve la photo en attente d'un article : elle devient la photo affichée (`imageUrl`), `pendingImageUrl` est vidé et l'ancienne photo est supprimée du storage.
+
+**Rôles** : `SUPER_ADMIN`, `SCHOOL_ADMIN` (école du vendeur)  
+**Params** : `id`
+
+**Réponse 200** : `ItemResponseDto` mis à jour
+
+**Erreurs**
+
+| Code | Message |
+|---|---|
+| `403` | Access denied |
+| `404` | `Item not found` |
+| `409` | `Item has no pending image to review` |
+
+---
+
+#### `PUT /items/:id/image/reject`
+
+Rejette la photo en attente d'un article : elle est supprimée du storage, `pendingImageUrl` est vidé. `imageUrl` (la photo actuellement visible) n'est pas modifié.
+
+**Rôles** : `SUPER_ADMIN`, `SCHOOL_ADMIN` (école du vendeur)  
+**Params** : `id`
+
+**Réponse 200** : `ItemResponseDto` mis à jour
+
+**Erreurs**
+
+| Code | Message |
+|---|---|
+| `403` | Access denied |
+| `404` | `Item not found` |
+| `409` | `Item has no pending image to review` |
 
 ---
 

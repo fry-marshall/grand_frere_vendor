@@ -34,7 +34,15 @@ class MenuScreen extends StatelessWidget {
     final confirmed = await _confirmImage(context, file);
     if (confirmed != true || !context.mounted) return;
 
-    await context.read<ItemsCubit>().uploadImage(item.id, file.path);
+    final cubit = context.read<ItemsCubit>();
+    await cubit.uploadImage(item.id, file.path);
+    if (!context.mounted) return;
+    if (cubit.state is! ItemsActionError) {
+      AppToast.show(
+        context,
+        'Photo envoyée pour approbation. Elle remplacera la photo actuelle dès validation par un administrateur.',
+      );
+    }
   }
 
   Future<bool?> _confirmImage(BuildContext context, XFile file) {
