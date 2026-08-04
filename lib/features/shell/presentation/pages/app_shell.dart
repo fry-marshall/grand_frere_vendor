@@ -14,6 +14,8 @@ import '../../../menu/presentation/pages/menu_screen.dart';
 import '../../../notifications/presentation/cubit/notifications_cubit.dart';
 import '../../../orders/presentation/cubit/orders_cubit.dart';
 import '../../../orders/presentation/pages/orders_screen.dart';
+import '../../../orders/presentation/widgets/orders_pending_approval_state.dart';
+import '../../../vendor/domain/entities/vendor.dart';
 import '../../../vendor/presentation/cubit/dashboard_cubit.dart';
 import '../../../vendor/presentation/cubit/vendor_cubit.dart';
 import '../../../vendor/presentation/cubit/vendor_state.dart';
@@ -31,13 +33,6 @@ class _AppShellState extends State<AppShell> {
   int _index = 0;
   StreamSubscription<VendorState>? _vendorSub;
 
-  static const _tabs = [
-    HomeScreen(),
-    OrdersScreen(),
-    MenuScreen(),
-    AccountScreen(),
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -45,21 +40,25 @@ class _AppShellState extends State<AppShell> {
 
     // Check current state immediately (vendor may already be loaded)
     if (vendorCubit.state is VendorLoaded) {
-      _loadAll((vendorCubit.state as VendorLoaded).vendor.id);
+      _loadAll((vendorCubit.state as VendorLoaded).vendor);
     }
 
     // Also listen for future emissions (covers the race condition)
     _vendorSub = vendorCubit.stream.listen((state) {
-      if (state is VendorLoaded) _loadAll(state.vendor.id);
+      if (state is VendorLoaded) _loadAll(state.vendor);
     });
   }
 
-  void _loadAll(String vendorId) {
-    getIt<OrdersCubit>().load(vendorId);
-    getIt<ItemsCubit>().load(vendorId);
-    getIt<BalanceCubit>().load(vendorId);
+  void _loadAll(Vendor vendor) {
+    // Orders/cashin are rejected by the API until the vendor is ACTIVE —
+    // skip the doomed call so the Orders tab doesn't flash an error state.
+    if (vendor.status == 'ACTIVE') {
+      getIt<OrdersCubit>().load(vendor.id);
+    }
+    getIt<ItemsCubit>().load(vendor.id);
+    getIt<BalanceCubit>().load(vendor.id);
     getIt<NotificationsCubit>().load();
-    getIt<DashboardCubit>().load(vendorId);
+    getIt<DashboardCubit>().load(vendor.id);
   }
 
   @override
@@ -80,18 +79,38 @@ class _AppShellState extends State<AppShell> {
         BlocProvider.value(value: getIt<NotificationsCubit>()),
         BlocProvider.value(value: getIt<DashboardCubit>()),
       ],
-      child: Scaffold(
-        backgroundColor: AppColors.paper,
-        body: IndexedStack(index: _index, children: _tabs),
-        floatingActionButton: _EncaisserFab(
-          onTap: () => context.push(Routes.cashin),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        bottomNavigationBar: _BottomBar(
-          index: _index,
-          bottomPad: bottomPad,
-          onTab: (i) => setState(() => _index = i),
-        ),
+      child: BlocBuilder<VendorCubit, VendorState>(
+        bloc: getIt<VendorCubit>(),
+        builder: (context, vendorState) {
+          // While the vendor profile is still loading, keep showing the
+          // orders screen (it has its own spinner) rather than flashing the
+          // locked state for an ACTIVE vendor whose profile just isn't in
+          // yet. Once VendorLoaded resolves, this rebuilds with the real
+          // status.
+          final isPending =
+              vendorState is VendorLoaded && vendorState.vendor.status != 'ACTIVE';
+
+          final tabs = [
+            const HomeScreen(),
+            isPending ? const OrdersPendingApprovalState() : const OrdersScreen(),
+            const MenuScreen(),
+            const AccountScreen(),
+          ];
+
+          return Scaffold(
+            backgroundColor: AppColors.paper,
+            body: IndexedStack(index: _index, children: tabs),
+            floatingActionButton: isPending
+                ? null
+                : _EncaisserFab(onTap: () => context.push(Routes.cashin)),
+            floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+            bottomNavigationBar: _BottomBar(
+              index: _index,
+              bottomPad: bottomPad,
+              onTab: (i) => setState(() => _index = i),
+            ),
+          );
+        },
       ),
     );
   }
