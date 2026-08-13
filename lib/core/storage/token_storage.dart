@@ -9,38 +9,43 @@ class TokenStorage {
   static const _roleKey = 'user_role';
   static const _userIdKey = 'user_id';
 
+  // Writes are sequential, not Future.wait-parallel: concurrent Keychain
+  // writes on iOS can race and silently drop one of the values without
+  // throwing, leaving e.g. the refresh token unpersisted after a "successful"
+  // save.
   Future<void> saveTokens({
     required String accessToken,
     required String refreshToken,
     required String role,
-  }) =>
-      Future.wait([
-        _storage.write(key: _accessKey, value: accessToken),
-        _storage.write(key: _refreshKey, value: refreshToken),
-        _storage.write(key: _roleKey, value: role),
-        _storage.write(key: _userIdKey, value: _extractSub(accessToken) ?? ''),
-      ]);
+  }) async {
+    await _storage.write(key: _accessKey, value: accessToken);
+    await _storage.write(key: _refreshKey, value: refreshToken);
+    await _storage.write(key: _roleKey, value: role);
+    await _storage.write(
+      key: _userIdKey,
+      value: _extractSub(accessToken) ?? '',
+    );
+  }
 
   Future<void> updateTokens({
     required String accessToken,
     required String refreshToken,
-  }) =>
-      Future.wait([
-        _storage.write(key: _accessKey, value: accessToken),
-        _storage.write(key: _refreshKey, value: refreshToken),
-      ]);
+  }) async {
+    await _storage.write(key: _accessKey, value: accessToken);
+    await _storage.write(key: _refreshKey, value: refreshToken);
+  }
 
   Future<String?> getAccessToken() => _storage.read(key: _accessKey);
   Future<String?> getRefreshToken() => _storage.read(key: _refreshKey);
   Future<String?> getRole() => _storage.read(key: _roleKey);
   Future<String?> getUserId() => _storage.read(key: _userIdKey);
 
-  Future<void> clearTokens() => Future.wait([
-        _storage.delete(key: _accessKey),
-        _storage.delete(key: _refreshKey),
-        _storage.delete(key: _roleKey),
-        _storage.delete(key: _userIdKey),
-      ]);
+  Future<void> clearTokens() async {
+    await _storage.delete(key: _accessKey);
+    await _storage.delete(key: _refreshKey);
+    await _storage.delete(key: _roleKey);
+    await _storage.delete(key: _userIdKey);
+  }
 
   static String? _extractSub(String token) {
     try {

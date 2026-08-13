@@ -39,7 +39,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       return;
     }
     final role = UserRole.values.where((r) => r.name == roleStr).firstOrNull;
-    if (role == null) {
+    if (role == null || role != UserRole.vendor) {
+      await _tokenStorage.clearTokens();
       emit(const AuthUnauthenticated());
       return;
     }
@@ -51,7 +52,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     final role = JwtDecoder.extractRole(event.accessToken);
-    if (role == null) {
+    // Vendor app: never persist/authenticate a token issued for another
+    // role (e.g. a parent/student account signing in here by mistake).
+    if (role == null || role != UserRole.vendor) {
       emit(const AuthUnauthenticated());
       return;
     }
@@ -67,9 +70,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     AuthLogoutRequested event,
     Emitter<AuthState> emit,
   ) async {
-    // Best-effort: needs the still-valid Bearer token, so it must run before clearing it.
-    // Ignored on failure (e.g. token already expired) — logout must not be blocked by this.
-    await _authRepository.updateFcmToken(null);
+    // Best-effort: needs the still-valid Bearer token, so it must run before
+    // clearing it. Skipped when there's no token left — that means this
+    // logout was triggered by AuthInterceptor after a 401 with tokens
+    // already cleared, and calling this with no token would itself 401 and
+    // re-trigger a logout, looping forever.
+    if (await _tokenStorage.getAccessToken() != null) {
+      await _authRepository.updateFcmToken(null);
+    }
     await _tokenStorage.clearTokens();
     emit(const AuthUnauthenticated());
   }
