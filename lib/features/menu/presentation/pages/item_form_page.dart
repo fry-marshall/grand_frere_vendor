@@ -182,8 +182,6 @@ class _ItemFormPageState extends State<ItemFormPage> {
                 currentUrl: widget.item?.imageUrl,
                 pickedFile: _pickedImage,
                 onTap: _saving ? null : _pickImage,
-                hasPendingImage:
-                    _pickedImage == null && (widget.item?.hasPendingImage ?? false),
               ),
               SizedBox(height: AppSpacing.lg),
               _Field(
@@ -260,13 +258,11 @@ class _ImagePicker extends StatelessWidget {
     required this.currentUrl,
     required this.pickedFile,
     required this.onTap,
-    this.hasPendingImage = false,
   });
 
   final String? currentUrl;
   final XFile? pickedFile;
   final VoidCallback? onTap;
-  final bool hasPendingImage;
 
   @override
   Widget build(BuildContext context) {
@@ -289,32 +285,8 @@ class _ImagePicker extends StatelessWidget {
                 )
               : null,
         ),
-        child: Stack(
-          children: [
-            if (!hasImage)
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.add_photo_alternate_outlined,
-                    color: AppColors.mute,
-                    size: 40,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Ajouter une photo',
-                    style: AppTextStyles.body.copyWith(color: AppColors.mute),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Touchez pour prendre une photo ou en choisir une',
-                    style:
-                        AppTextStyles.caption.copyWith(color: AppColors.line),
-                  ),
-                ],
-              ),
-            if (hasImage)
-              Align(
+        child: hasImage
+            ? Align(
                 alignment: Alignment.bottomRight,
                 child: Padding(
                   padding: const EdgeInsets.all(10),
@@ -343,42 +315,28 @@ class _ImagePicker extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
-            if (hasPendingImage)
-              Positioned(
-                left: 10,
-                top: 10,
-                right: 10,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: AppColors.warning,
-                    borderRadius: AppRadius.pill,
+              )
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.add_photo_alternate_outlined,
+                    color: AppColors.mute,
+                    size: 40,
                   ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.hourglass_top_rounded,
-                          color: Colors.white, size: 14),
-                      SizedBox(width: 6),
-                      Flexible(
-                        child: Text(
-                          'Nouvelle photo en attente de validation',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 8),
+                  Text(
+                    'Ajouter une photo',
+                    style: AppTextStyles.body.copyWith(color: AppColors.mute),
                   ),
-                ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Touchez pour prendre une photo ou en choisir une',
+                    style:
+                        AppTextStyles.caption.copyWith(color: AppColors.line),
+                  ),
+                ],
               ),
-          ],
-        ),
       ),
     );
   }

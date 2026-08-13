@@ -79,26 +79,6 @@ class ItemCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
-                  if (item.hasPendingImage) ...[
-                    SizedBox(height: AppSpacing.micro),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.hourglass_top_rounded,
-                          color: AppColors.warning,
-                          size: 12,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Nouvelle photo en attente de validation',
-                          style: AppTextStyles.caption.copyWith(
-                            color: AppColors.warning,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
                   SizedBox(height: AppSpacing.sm),
                   Row(
                     children: [
@@ -194,51 +174,51 @@ class _ItemImage extends StatelessWidget {
                 )
               : null,
         ),
-        child: Stack(
-          children: [
-            if (item.imageUrl == null)
-              const Center(
-                child: Icon(
-                  Icons.restaurant_outlined,
-                  color: AppColors.gold,
-                  size: 28,
-                ),
-              ),
-            Positioned(
-              right: 4,
-              bottom: 4,
-              child: Container(
-                padding: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: item.imageUrl == null ? AppColors.gold : Colors.black54,
-                  borderRadius: AppRadius.pill,
-                ),
-                child: const Icon(
-                  Icons.camera_alt_outlined,
-                  color: Colors.white,
-                  size: 10,
-                ),
-              ),
-            ),
-            if (item.hasPendingImage)
-              Positioned(
-                left: 4,
-                top: 4,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: const BoxDecoration(
-                    color: AppColors.warning,
-                    shape: BoxShape.circle,
+        child: item.imageUrl == null
+            ? Stack(
+                alignment: Alignment.center,
+                children: [
+                  const Icon(
+                    Icons.restaurant_outlined,
+                    color: AppColors.gold,
+                    size: 28,
                   ),
-                  child: const Icon(
-                    Icons.hourglass_top_rounded,
-                    color: Colors.white,
-                    size: 10,
+                  Positioned(
+                    right: 4,
+                    bottom: 4,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: AppColors.gold,
+                        borderRadius: AppRadius.pill,
+                      ),
+                      child: const Icon(
+                        Icons.camera_alt_outlined,
+                        color: Colors.white,
+                        size: 10,
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : Align(
+                alignment: Alignment.bottomRight,
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      borderRadius: AppRadius.pill,
+                    ),
+                    child: const Icon(
+                      Icons.camera_alt_outlined,
+                      color: Colors.white,
+                      size: 10,
+                    ),
                   ),
                 ),
               ),
-          ],
-        ),
       ),
     );
   }
