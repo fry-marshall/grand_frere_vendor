@@ -49,8 +49,7 @@ class CashinSuccessView extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: '${formatXof(order.totalAmount)} FCFA ',
-                    style:
-                        AppTextStyles.h3.copyWith(color: AppColors.maroon),
+                    style: AppTextStyles.h3.copyWith(color: AppColors.maroon),
                   ),
                   const TextSpan(text: 'encaissés\nauprès de '),
                   TextSpan(
@@ -66,7 +65,9 @@ class CashinSuccessView extends StatelessWidget {
             Center(
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 18, vertical: 10),
+                  horizontal: 18,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.white,
                   borderRadius: AppRadius.pill,
@@ -75,13 +76,15 @@ class CashinSuccessView extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.receipt_rounded,
-                        color: AppColors.gold, size: 16),
+                    const Icon(
+                      Icons.receipt_rounded,
+                      color: AppColors.gold,
+                      size: 16,
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       '#${order.shortCode ?? order.id.substring(0, 6).toUpperCase()} · ${order.items.length} article${order.items.length > 1 ? 's' : ''}',
-                      style: AppTextStyles.label
-                          .copyWith(color: AppColors.ink),
+                      style: AppTextStyles.label.copyWith(color: AppColors.ink),
                     ),
                   ],
                 ),
@@ -94,7 +97,8 @@ class CashinSuccessView extends StatelessWidget {
               onTap: () => context.pop(),
               child: Container(
                 padding: EdgeInsets.symmetric(
-                    vertical: AppSpacing.buttonVertical),
+                  vertical: AppSpacing.buttonVertical,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.maroon,
                   borderRadius: AppRadius.pill,
@@ -103,8 +107,9 @@ class CashinSuccessView extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(
                   "Retour à l'accueil",
-                  style: AppTextStyles.buttonLabel
-                      .copyWith(color: AppColors.white),
+                  style: AppTextStyles.buttonLabel.copyWith(
+                    color: AppColors.white,
+                  ),
                 ),
               ),
             ),

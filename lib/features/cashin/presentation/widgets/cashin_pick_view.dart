@@ -15,11 +15,7 @@ import '../../domain/entities/pending_order.dart';
 import '../../domain/repositories/cashin_repository.dart';
 
 class CashinPickView extends StatefulWidget {
-  const CashinPickView({
-    super.key,
-    required this.onScan,
-    required this.onCode,
-  });
+  const CashinPickView({super.key, required this.onScan, required this.onCode});
 
   final VoidCallback onScan;
   final VoidCallback onCode;
@@ -37,8 +33,8 @@ class _CashinPickViewState extends State<CashinPickView> {
     final vendorState = context.read<VendorCubit>().state;
     _pendingFuture = vendorState is VendorLoaded
         ? getIt<CashinRepository>()
-            .getPendingOrders(vendorState.vendor.id)
-            .then((e) => e.fold((_) => <PendingOrder>[], (o) => o))
+              .getPendingOrders(vendorState.vendor.id)
+              .then((e) => e.fold((_) => <PendingOrder>[], (o) => o))
         : Future.value([]);
   }
 
@@ -51,7 +47,11 @@ class _CashinPickViewState extends State<CashinPickView> {
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left_rounded, color: AppColors.maroon, size: 28),
+          icon: const Icon(
+            Icons.chevron_left_rounded,
+            color: AppColors.maroon,
+            size: 28,
+          ),
           onPressed: () => context.pop(),
         ),
         title: Text(
@@ -136,7 +136,10 @@ class _OptionCard extends StatelessWidget {
             Container(
               width: 48,
               height: 48,
-              decoration: BoxDecoration(color: iconBg, borderRadius: AppRadius.sm),
+              decoration: BoxDecoration(
+                color: iconBg,
+                borderRadius: AppRadius.sm,
+              ),
               child: Icon(icon, color: iconColor, size: 24),
             ),
             SizedBox(width: AppSpacing.md),
@@ -154,7 +157,9 @@ class _OptionCard extends StatelessWidget {
                   ),
                   Text(
                     description,
-                    style: AppTextStyles.caption.copyWith(color: AppColors.mute),
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.mute,
+                    ),
                   ),
                 ],
               ),
@@ -180,7 +185,10 @@ class _PendingOrdersSection extends StatelessWidget {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(24),
-              child: CircularProgressIndicator(color: AppColors.gold, strokeWidth: 2),
+              child: CircularProgressIndicator(
+                color: AppColors.gold,
+                strokeWidth: 2,
+              ),
             ),
           );
         }

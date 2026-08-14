@@ -76,15 +76,18 @@ class _CashinOrchestratorState extends State<_CashinOrchestrator> {
           }
 
           return switch (_view) {
-            _CashinView.pick => CashinPickView(onScan: _goScan, onCode: _goCode),
+            _CashinView.pick => CashinPickView(
+              onScan: _goScan,
+              onCode: _goCode,
+            ),
             _CashinView.scanning => CashinScanView(
-                onBack: _reset,
-                onSwitchToCode: _goCode,
-              ),
+              onBack: _reset,
+              onSwitchToCode: _goCode,
+            ),
             _CashinView.coding => CashinCodeView(
-                onBack: _reset,
-                onSwitchToScan: _goScan,
-              ),
+              onBack: _reset,
+              onSwitchToScan: _goScan,
+            ),
           };
         },
       ),

@@ -8,6 +8,9 @@ abstract class CashinRepository {
   Future<Either<Failure, String>> scanCard(String cardCode);
   Future<Either<Failure, Order>> getOrderByCard(String cardCode);
   Future<Either<Failure, Order>> getOrderByCode(String code);
-  Future<Either<Failure, Unit>> completeOrder(String orderId);
+  Future<Either<Failure, Unit>> completeOrder(
+    String orderId, {
+    required String pin,
+  });
   Future<Either<Failure, List<PendingOrder>>> getPendingOrders(String vendorId);
 }

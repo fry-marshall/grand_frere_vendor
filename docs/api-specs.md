@@ -2096,7 +2096,14 @@ Valide une commande en attente et crédite le wallet vendeur.
 Confirme la livraison / encaissement d'une commande validée. État terminal positif du flux commande.
 
 **Rôles** : `VENDOR` (vendeur de la commande), `SUPER_ADMIN`  
-**Params** : `id`
+**Params** : `id`  
+**Body** (`VENDOR` uniquement) :
+
+| Champ | Type | Requis |
+|---|---|---|
+| `pin` | `string` (4 chiffres) | oui pour `VENDOR` |
+
+Le PIN doit être celui de la carte de l'élève de la commande — vérifié comme `PUT /cards/:code/verify-pin` (incrémente les tentatives, bloque la carte après 3 échecs). Un `SUPER_ADMIN` peut compléter sans PIN.
 
 **Réponse 200** : `OrderResponseDto` avec `status: "COMPLETED"`
 
@@ -2104,9 +2111,11 @@ Confirme la livraison / encaissement d'une commande validée. État terminal pos
 
 | Code | Message |
 |---|---|
-| `400` | `Order is not in validated status` |
-| `403` | Access denied |
-| `404` | `Order not found` |
+| `400` | `Order is not in validated status` \| `Card PIN is required to complete this order` |
+| `401` | `Invalid PIN` |
+| `403` | Access denied \| `Card is blocked after 3 failed PIN attempts` |
+| `404` | `Order not found` \| `Card not found` |
+| `409` | `Card is not active` \| `Card PIN is not set` |
 
 **Side effects**
 

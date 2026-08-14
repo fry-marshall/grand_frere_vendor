@@ -45,9 +45,12 @@ class CashinRepositoryImpl implements CashinRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> completeOrder(String orderId) async {
+  Future<Either<Failure, Unit>> completeOrder(
+    String orderId, {
+    required String pin,
+  }) async {
     try {
-      await _remote.completeOrder(orderId);
+      await _remote.completeOrder(orderId, pin: pin);
       return const Right(unit);
     } on ApiException catch (e) {
       if (e.isNetworkError) return const Left(NetworkFailure());
@@ -56,7 +59,9 @@ class CashinRepositoryImpl implements CashinRepository {
   }
 
   @override
-  Future<Either<Failure, List<PendingOrder>>> getPendingOrders(String vendorId) async {
+  Future<Either<Failure, List<PendingOrder>>> getPendingOrders(
+    String vendorId,
+  ) async {
     try {
       final models = await _remote.getPendingOrders(vendorId);
       return Right(models.map((m) => m.toDomain()).toList());

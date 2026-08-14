@@ -19,9 +19,6 @@ class OrderItemModel {
     );
   }
 
-  OrderItem toDomain() => OrderItem(
-        name: name,
-        quantity: quantity,
-        unitPrice: unitPrice,
-      );
+  OrderItem toDomain() =>
+      OrderItem(name: name, quantity: quantity, unitPrice: unitPrice);
 }

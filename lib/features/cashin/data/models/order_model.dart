@@ -49,15 +49,15 @@ class OrderModel {
   }
 
   Order toDomain() => Order(
-        id: id,
-        status: status,
-        paymentMethod: paymentMethod,
-        totalAmount: totalAmount,
-        studentFirstName: studentFirstName,
-        studentLastName: studentLastName,
-        createdAt: createdAt,
-        shortCode: shortCode,
-        expiresAt: expiresAt,
-        items: items.map((e) => e.toDomain()).toList(),
-      );
+    id: id,
+    status: status,
+    paymentMethod: paymentMethod,
+    totalAmount: totalAmount,
+    studentFirstName: studentFirstName,
+    studentLastName: studentLastName,
+    createdAt: createdAt,
+    shortCode: shortCode,
+    expiresAt: expiresAt,
+    items: items.map((e) => e.toDomain()).toList(),
+  );
 }

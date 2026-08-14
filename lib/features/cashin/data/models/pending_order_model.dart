@@ -34,11 +34,11 @@ class PendingOrderModel {
   }
 
   PendingOrder toDomain() => PendingOrder(
-        id: id,
-        studentFirstName: studentFirstName,
-        studentLastName: studentLastName,
-        studentClass: studentClass,
-        totalAmount: totalAmount,
-        itemNames: itemNames,
-      );
+    id: id,
+    studentFirstName: studentFirstName,
+    studentLastName: studentLastName,
+    studentClass: studentClass,
+    totalAmount: totalAmount,
+    itemNames: itemNames,
+  );
 }

@@ -82,7 +82,9 @@ class _CashinCodeViewState extends State<CashinCodeView> {
               ),
               label: Text(
                 'Scan',
-                style: AppTextStyles.buttonSmall.copyWith(color: AppColors.gold),
+                style: AppTextStyles.buttonSmall.copyWith(
+                  color: AppColors.gold,
+                ),
               ),
             ),
           ],
@@ -108,7 +110,9 @@ class _CashinCodeViewState extends State<CashinCodeView> {
                   SizedBox(height: AppSpacing.xs),
                   Text(
                     'Format : 4 chiffres',
-                    style: AppTextStyles.caption.copyWith(color: AppColors.mute),
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.mute,
+                    ),
                   ),
                 ],
               ),
@@ -130,7 +134,9 @@ class _CashinCodeViewState extends State<CashinCodeView> {
                     onTap: (_isComplete && !isLoading) ? _onValidate : null,
                     child: Container(
                       width: double.infinity,
-                      padding: EdgeInsets.symmetric(vertical: AppSpacing.buttonVertical),
+                      padding: EdgeInsets.symmetric(
+                        vertical: AppSpacing.buttonVertical,
+                      ),
                       decoration: BoxDecoration(
                         gradient: _isComplete
                             ? const LinearGradient(
@@ -153,7 +159,9 @@ class _CashinCodeViewState extends State<CashinCodeView> {
                           : Text(
                               'Valider',
                               style: AppTextStyles.buttonLabel.copyWith(
-                                color: _isComplete ? Colors.white : AppColors.gold,
+                                color: _isComplete
+                                    ? Colors.white
+                                    : AppColors.gold,
                               ),
                             ),
                     ),
@@ -179,10 +187,7 @@ class _CodeDisplay extends StatelessWidget {
       children: [
         Text('#', style: AppTextStyles.h1.copyWith(color: AppColors.maroon)),
         SizedBox(width: AppSpacing.sm),
-        ...List.generate(
-          4,
-          (i) => _DigitBox(digit: digits[i]),
-        ),
+        ...List.generate(4, (i) => _DigitBox(digit: digits[i])),
       ],
     );
   }
@@ -205,7 +210,10 @@ class _DigitBox extends StatelessWidget {
       ),
       alignment: Alignment.center,
       child: digit != null
-          ? Text(digit.toString(), style: AppTextStyles.h1.copyWith(color: AppColors.maroon))
+          ? Text(
+              digit.toString(),
+              style: AppTextStyles.h1.copyWith(color: AppColors.maroon),
+            )
           : null,
     );
   }
@@ -251,7 +259,11 @@ class _NumRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: digits
-          .map((d) => Expanded(child: _NumKey(digit: d, onDigit: onDigit)))
+          .map(
+            (d) => Expanded(
+              child: _NumKey(digit: d, onDigit: onDigit),
+            ),
+          )
           .toList(),
     );
   }
@@ -301,7 +313,11 @@ class _BackspaceKey extends StatelessWidget {
           boxShadow: AppShadows.xs,
         ),
         alignment: Alignment.center,
-        child: const Icon(Icons.backspace_outlined, color: AppColors.maroon, size: 22),
+        child: const Icon(
+          Icons.backspace_outlined,
+          color: AppColors.maroon,
+          size: 22,
+        ),
       ),
     );
   }

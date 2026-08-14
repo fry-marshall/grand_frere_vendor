@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -12,7 +13,9 @@ import '../../domain/entities/order_item.dart';
 import '../cubit/cashin_cubit.dart';
 import '../cubit/cashin_state.dart';
 
-class CashinConfirmView extends StatelessWidget {
+const _pinLength = 4;
+
+class CashinConfirmView extends StatefulWidget {
   const CashinConfirmView({
     super.key,
     required this.order,
@@ -25,7 +28,23 @@ class CashinConfirmView extends StatelessWidget {
   final VoidCallback onCancel;
 
   @override
+  State<CashinConfirmView> createState() => _CashinConfirmViewState();
+}
+
+class _CashinConfirmViewState extends State<CashinConfirmView> {
+  final _pinCtrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _pinCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final order = widget.order;
+    final isSubmitting = widget.isSubmitting;
+    final onCancel = widget.onCancel;
     final bottomPad = MediaQuery.paddingOf(context).bottom;
 
     return Scaffold(
@@ -63,7 +82,9 @@ class CashinConfirmView extends StatelessWidget {
                 Center(
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 6),
+                      horizontal: 14,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.successSurface,
                       borderRadius: AppRadius.pill,
@@ -71,13 +92,17 @@ class CashinConfirmView extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.verified_rounded,
-                            color: AppColors.success, size: 15),
+                        const Icon(
+                          Icons.verified_rounded,
+                          color: AppColors.success,
+                          size: 15,
+                        ),
                         const SizedBox(width: 6),
                         Text(
                           'Carte Grand-Frère reconnue',
                           style: AppTextStyles.label.copyWith(
-                              color: AppColors.successText),
+                            color: AppColors.successText,
+                          ),
                         ),
                       ],
                     ),
@@ -91,6 +116,10 @@ class CashinConfirmView extends StatelessWidget {
 
                 // ── Order receipt ───────────────────────────────────────
                 _ReceiptCard(order: order),
+                SizedBox(height: AppSpacing.md),
+
+                // ── Card PIN ─────────────────────────────────────────────
+                _PinField(controller: _pinCtrl, enabled: !isSubmitting),
               ],
             ),
           ),
@@ -116,6 +145,7 @@ class CashinConfirmView extends StatelessWidget {
               isSubmitting: isSubmitting,
               onCancel: onCancel,
               bottomPad: bottomPad,
+              pinController: _pinCtrl,
             ),
           ),
         ],
@@ -152,8 +182,11 @@ class _StudentCard extends StatelessWidget {
               color: Colors.white.withAlpha(28),
               borderRadius: AppRadius.sm,
             ),
-            child: const Icon(Icons.person_rounded,
-                color: Colors.white, size: 28),
+            child: const Icon(
+              Icons.person_rounded,
+              color: Colors.white,
+              size: 28,
+            ),
           ),
           SizedBox(width: AppSpacing.md),
           Expanded(
@@ -191,8 +224,7 @@ class _StudentCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white.withAlpha(28),
               borderRadius: AppRadius.pill,
-              border:
-                  Border.all(color: Colors.white.withAlpha(50), width: 1),
+              border: Border.all(color: Colors.white.withAlpha(50), width: 1),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -263,8 +295,11 @@ class _ReceiptCard extends StatelessWidget {
                     color: AppColors.goldSoft,
                     borderRadius: AppRadius.sm,
                   ),
-                  child: const Icon(Icons.receipt_long_rounded,
-                      color: AppColors.gold, size: 20),
+                  child: const Icon(
+                    Icons.receipt_long_rounded,
+                    color: AppColors.gold,
+                    size: 20,
+                  ),
                 ),
                 SizedBox(width: AppSpacing.sm),
                 Expanded(
@@ -273,20 +308,24 @@ class _ReceiptCard extends StatelessWidget {
                     children: [
                       Text(
                         'Commande #${order.shortCode ?? order.id.substring(0, 6).toUpperCase()}',
-                        style: AppTextStyles.cardTitle
-                            .copyWith(color: AppColors.ink),
+                        style: AppTextStyles.cardTitle.copyWith(
+                          color: AppColors.ink,
+                        ),
                       ),
                       Text(
                         _timeAgo(),
-                        style: AppTextStyles.caption
-                            .copyWith(color: AppColors.mute),
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.mute,
+                        ),
                       ),
                     ],
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 4),
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.successSurface,
                     borderRadius: AppRadius.pill,
@@ -302,7 +341,12 @@ class _ReceiptCard extends StatelessWidget {
               ],
             ),
           ),
-          const Divider(color: AppColors.line, height: 1, indent: 16, endIndent: 16),
+          const Divider(
+            color: AppColors.line,
+            height: 1,
+            indent: 16,
+            endIndent: 16,
+          ),
 
           // Items
           Padding(
@@ -316,7 +360,12 @@ class _ReceiptCard extends StatelessWidget {
                   .toList(),
             ),
           ),
-          const Divider(color: AppColors.line, height: 1, indent: 16, endIndent: 16),
+          const Divider(
+            color: AppColors.line,
+            height: 1,
+            indent: 16,
+            endIndent: 16,
+          ),
 
           // Total
           Padding(
@@ -326,14 +375,88 @@ class _ReceiptCard extends StatelessWidget {
               children: [
                 Text(
                   'Total à encaisser',
-                  style:
-                      AppTextStyles.body.copyWith(color: AppColors.mute),
+                  style: AppTextStyles.body.copyWith(color: AppColors.mute),
                 ),
                 Text(
                   '${formatXof(order.totalAmount)} FCFA',
                   style: AppTextStyles.h2.copyWith(color: AppColors.maroon),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Card PIN ─────────────────────────────────────────────────────────────────
+
+class _PinField extends StatelessWidget {
+  const _PinField({required this.controller, required this.enabled});
+
+  final TextEditingController controller;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: AppRadius.card,
+        boxShadow: AppShadows.sm,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Code PIN de la carte',
+            style: AppTextStyles.label.copyWith(color: AppColors.ink),
+          ),
+          SizedBox(height: AppSpacing.micro),
+          Text(
+            "Demande à l'élève de saisir son code à 4 chiffres pour confirmer.",
+            style: AppTextStyles.caption.copyWith(color: AppColors.mute),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: controller,
+            enabled: enabled,
+            autofocus: false,
+            obscureText: true,
+            keyboardType: TextInputType.number,
+            textAlign: TextAlign.center,
+            maxLength: _pinLength,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            style: AppTextStyles.h2.copyWith(
+              color: AppColors.ink,
+              letterSpacing: 12,
+            ),
+            decoration: InputDecoration(
+              counterText: '',
+              hintText: '••••',
+              hintStyle: AppTextStyles.h2.copyWith(
+                color: AppColors.line,
+                letterSpacing: 12,
+              ),
+              filled: true,
+              fillColor: AppColors.paper,
+              border: OutlineInputBorder(
+                borderRadius: AppRadius.sm,
+                borderSide: const BorderSide(color: AppColors.line),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: AppRadius.sm,
+                borderSide: const BorderSide(color: AppColors.line),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: AppRadius.sm,
+                borderSide: const BorderSide(color: AppColors.gold, width: 1.5),
+              ),
+              contentPadding: EdgeInsets.symmetric(
+                vertical: AppSpacing.inputVertical,
+              ),
             ),
           ),
         ],
@@ -396,12 +519,14 @@ class _BottomBar extends StatelessWidget {
     required this.isSubmitting,
     required this.onCancel,
     required this.bottomPad,
+    required this.pinController,
   });
 
   final Order order;
   final bool isSubmitting;
   final VoidCallback onCancel;
   final double bottomPad;
+  final TextEditingController pinController;
 
   @override
   Widget build(BuildContext context) {
@@ -419,43 +544,57 @@ class _BottomBar extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          BlocBuilder<CashinCubit, CashinState>(
-            builder: (ctx, _) => GestureDetector(
-              onTap: isSubmitting
-                  ? null
-                  : () => ctx.read<CashinCubit>().completeOrder(order),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(
-                    vertical: AppSpacing.buttonVertical),
-                decoration: BoxDecoration(
-                  gradient: isSubmitting
-                      ? null
-                      : const LinearGradient(
-                          colors: [AppColors.gold, AppColors.goldDeep],
-                        ),
-                  color: isSubmitting ? AppColors.line : null,
-                  borderRadius: AppRadius.pill,
-                  boxShadow: isSubmitting ? null : AppShadows.button,
-                ),
-                alignment: Alignment.center,
-                child: isSubmitting
-                    ? const SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.5,
-                          color: AppColors.gold,
-                        ),
-                      )
-                    : Text(
-                        'Encaisser ${formatXof(order.totalAmount)} FCFA',
-                        style: AppTextStyles.buttonLabel
-                            .copyWith(color: Colors.white),
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: pinController,
+            builder: (_, pinValue, _) {
+              final pinComplete = pinValue.text.length == _pinLength;
+              return BlocBuilder<CashinCubit, CashinState>(
+                builder: (ctx, _) {
+                  final canSubmit = !isSubmitting && pinComplete;
+                  return GestureDetector(
+                    onTap: canSubmit
+                        ? () => ctx.read<CashinCubit>().completeOrder(
+                            order,
+                            pin: pinController.text,
+                          )
+                        : null,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(
+                        vertical: AppSpacing.buttonVertical,
                       ),
-              ),
-            ),
+                      decoration: BoxDecoration(
+                        gradient: canSubmit
+                            ? const LinearGradient(
+                                colors: [AppColors.gold, AppColors.goldDeep],
+                              )
+                            : null,
+                        color: canSubmit ? null : AppColors.line,
+                        borderRadius: AppRadius.pill,
+                        boxShadow: canSubmit ? AppShadows.button : null,
+                      ),
+                      alignment: Alignment.center,
+                      child: isSubmitting
+                          ? const SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: AppColors.gold,
+                              ),
+                            )
+                          : Text(
+                              'Encaisser ${formatXof(order.totalAmount)} FCFA',
+                              style: AppTextStyles.buttonLabel.copyWith(
+                                color: Colors.white,
+                              ),
+                            ),
+                    ),
+                  );
+                },
+              );
+            },
           ),
           TextButton(
             onPressed: isSubmitting ? null : onCancel,
