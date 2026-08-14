@@ -47,7 +47,23 @@ class _CashinScanViewState extends State<CashinScanView> {
     final code = capture.barcodes.firstOrNull?.rawValue;
     if (code == null) return;
     setState(() => _hasScanned = true);
+    // Stop decoding immediately: the card is still under the camera while
+    // the lookup runs and while its error toast is visible, and without
+    // this the scanner kept re-detecting the same card and re-firing the
+    // same failed lookup in a tight loop.
+    _controller.stop();
     context.read<CashinCubit>().lookupByCard(code);
+  }
+
+  /// Give the cashier a moment to move the card away before the camera
+  /// starts decoding again — resuming immediately just re-triggers the same
+  /// lookup (and the same error) while the card is still in frame.
+  void _resumeScanningAfterDelay() {
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      if (!mounted) return;
+      _controller.start();
+      setState(() => _hasScanned = false);
+    });
   }
 
   void _toggleTorch() {
@@ -59,7 +75,10 @@ class _CashinScanViewState extends State<CashinScanView> {
   Widget build(BuildContext context) {
     return BlocListener<CashinCubit, CashinState>(
       listener: (_, state) {
-        if (state is CashinError || state is CashinInitial) {
+        if (state is CashinError) {
+          _resumeScanningAfterDelay();
+        } else if (state is CashinInitial) {
+          _controller.start();
           setState(() => _hasScanned = false);
         }
       },
@@ -150,9 +169,7 @@ class _ScanOverlay extends StatelessWidget {
             alignment: Alignment.center,
             children: [
               Positioned.fill(
-                child: CustomPaint(
-                  painter: _DimPainter(_reticleW, _reticleH),
-                ),
+                child: CustomPaint(painter: _DimPainter(_reticleW, _reticleH)),
               ),
               SizedBox(
                 width: _reticleW,
@@ -199,7 +216,9 @@ class _ScanOverlay extends StatelessWidget {
                   ),
                   child: Text(
                     'Saisir le code à la place',
-                    style: AppTextStyles.buttonSmall.copyWith(color: Colors.white),
+                    style: AppTextStyles.buttonSmall.copyWith(
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
@@ -255,12 +274,22 @@ class _ReticlePainter extends CustomPainter {
     canvas.drawLine(Offset(size.width, 0), Offset(size.width, len), paint);
     // bottom-left
     canvas.drawLine(Offset(0, size.height), Offset(len, size.height), paint);
-    canvas.drawLine(Offset(0, size.height), Offset(0, size.height - len), paint);
+    canvas.drawLine(
+      Offset(0, size.height),
+      Offset(0, size.height - len),
+      paint,
+    );
     // bottom-right
     canvas.drawLine(
-        Offset(size.width, size.height), Offset(size.width - len, size.height), paint);
+      Offset(size.width, size.height),
+      Offset(size.width - len, size.height),
+      paint,
+    );
     canvas.drawLine(
-        Offset(size.width, size.height), Offset(size.width, size.height - len), paint);
+      Offset(size.width, size.height),
+      Offset(size.width, size.height - len),
+      paint,
+    );
 
     // scan line
     canvas.drawLine(
