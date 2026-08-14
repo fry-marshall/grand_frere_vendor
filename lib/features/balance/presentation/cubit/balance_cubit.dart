@@ -23,10 +23,12 @@ class BalanceCubit extends Cubit<BalanceState> {
       return;
     }
 
-    emit(BalanceLoaded(
-      balance: balanceResult.getRight().toNullable()!,
-      withdrawals: withdrawalsResult.getRight().toNullable() ?? [],
-    ));
+    emit(
+      BalanceLoaded(
+        balance: balanceResult.getRight().toNullable()!,
+        withdrawals: withdrawalsResult.getRight().toNullable() ?? [],
+      ),
+    );
   }
 
   Future<void> refresh() async {
@@ -45,8 +47,9 @@ class BalanceCubit extends Cubit<BalanceState> {
       amount: amount,
       waveNumber: waveNumber,
     );
-    result.fold(
-      (f) => emit(BalanceActionError(message: f.message, previous: loaded)),
+    await result.fold(
+      (f) async =>
+          emit(BalanceActionError(message: f.message, previous: loaded)),
       (_) => load(_vendorId!),
     );
   }

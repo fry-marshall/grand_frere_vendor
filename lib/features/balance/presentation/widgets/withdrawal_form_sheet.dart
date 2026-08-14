@@ -49,13 +49,16 @@ class _WithdrawalFormSheetState extends State<WithdrawalFormSheet> {
     super.dispose();
   }
 
-  Future<void> _submit() async {
+  void _submit() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    await context.read<BalanceCubit>().createWithdrawal(
-          amount: int.parse(_amount.text.trim()),
-          waveNumber: _wave.text.trim(),
-        );
-    if (mounted) Navigator.of(context).pop();
+    // Closing the sheet is handled by the BlocListener below, reacting to
+    // the resulting BalanceLoaded/BalanceActionError state — popping here
+    // too caused a double pop (and a black screen from the broken nav
+    // stack) once the cubit's state caught up.
+    context.read<BalanceCubit>().createWithdrawal(
+      amount: int.parse(_amount.text.trim()),
+      waveNumber: _wave.text.trim(),
+    );
   }
 
   @override
@@ -127,15 +130,15 @@ class _WithdrawalFormSheetState extends State<WithdrawalFormSheet> {
                 hint: '+2250700000000',
                 keyboardType: TextInputType.phone,
                 validator: (v) {
-                  if (v == null || v.trim().length < 3) return 'Numéro invalide';
+                  if (v == null || v.trim().length < 3)
+                    return 'Numéro invalide';
                   return null;
                 },
               ),
               SizedBox(height: AppSpacing.lg),
               BlocBuilder<BalanceCubit, BalanceState>(
                 builder: (_, state) {
-                  final isCreating =
-                      state is BalanceLoaded && state.isCreating;
+                  final isCreating = state is BalanceLoaded && state.isCreating;
                   return GestureDetector(
                     onTap: isCreating ? null : _submit,
                     child: Container(
@@ -165,8 +168,9 @@ class _WithdrawalFormSheetState extends State<WithdrawalFormSheet> {
                             )
                           : Text(
                               'Confirmer le retrait',
-                              style: AppTextStyles.buttonLabel
-                                  .copyWith(color: Colors.white),
+                              style: AppTextStyles.buttonLabel.copyWith(
+                                color: Colors.white,
+                              ),
                             ),
                     ),
                   );
