@@ -17,8 +17,11 @@ class SignupSectionLabel extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: Text(
         text.toUpperCase(),
-        style: AppTextStyles.label
-            .copyWith(color: AppColors.brown, fontSize: 11, letterSpacing: 1.4),
+        style: AppTextStyles.label.copyWith(
+          color: AppColors.brown,
+          fontSize: 11,
+          letterSpacing: 1.4,
+        ),
       ),
     );
   }
@@ -33,7 +36,9 @@ class SignupSelectedSchool extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.sm,
+      ),
       decoration: BoxDecoration(
         color: AppColors.cream,
         borderRadius: BorderRadius.circular(14),
@@ -50,7 +55,10 @@ class SignupSelectedSchool extends StatelessWidget {
                 Text(
                   'Votre école',
                   style: AppTextStyles.label.copyWith(
-                      color: AppColors.mute, fontSize: 11, letterSpacing: 1.0),
+                    color: AppColors.mute,
+                    fontSize: 11,
+                    letterSpacing: 1.0,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -104,9 +112,10 @@ class _WaveTextFieldState extends State<WaveTextField> {
         Text(
           'Numéro Wave',
           style: AppTextStyles.body.copyWith(
-              color: AppColors.maroon,
-              fontWeight: FontWeight.w700,
-              fontSize: 13),
+            color: AppColors.maroon,
+            fontWeight: FontWeight.w700,
+            fontSize: 13,
+          ),
         ),
         const SizedBox(height: 6),
         AnimatedContainer(
@@ -145,18 +154,22 @@ class _WaveTextFieldState extends State<WaveTextField> {
                   focusNode: _focus,
                   keyboardType: TextInputType.phone,
                   textInputAction: TextInputAction.next,
-                  style: AppTextStyles.body
-                      .copyWith(color: AppColors.ink, fontSize: 15),
+                  style: AppTextStyles.body.copyWith(
+                    color: AppColors.ink,
+                    fontSize: 15,
+                  ),
                   decoration: InputDecoration(
                     isDense: true,
                     border: InputBorder.none,
                     hintText: '07 00 00 00 00',
-                    hintStyle: AppTextStyles.body
-                        .copyWith(color: AppColors.mute, fontSize: 15),
+                    hintStyle: AppTextStyles.body.copyWith(
+                      color: AppColors.mute,
+                      fontSize: 15,
+                    ),
                     focusedBorder: InputBorder.none,
                     disabledBorder: InputBorder.none,
                     enabledBorder: InputBorder.none,
-                    contentPadding: EdgeInsets.zero
+                    contentPadding: EdgeInsets.zero,
                   ),
                 ),
               ),
@@ -176,28 +189,7 @@ class _WaveTextFieldState extends State<WaveTextField> {
 class _WaveBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1F2EBA),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(Icons.waves_rounded, size: 13, color: Colors.white),
-          const SizedBox(width: 5),
-          Text(
-            'WAVE',
-            style: AppTextStyles.label.copyWith(
-              color: Colors.white,
-              fontSize: 11,
-              letterSpacing: 0.8,
-            ),
-          ),
-        ],
-      ),
-    );
+    return Image.asset('assets/wave_logo.png', width: 24, height: 24);
   }
 }
 
