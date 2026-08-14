@@ -148,9 +148,9 @@ class _HomeBodyState extends State<_HomeBody> {
                     context.read<BalanceCubit>().refresh(),
                     context.read<VendorCubit>().load(),
                     if (vendorState is VendorLoaded)
-                      context
-                          .read<DashboardCubit>()
-                          .load(vendorState.vendor.id),
+                      context.read<DashboardCubit>().load(
+                        vendorState.vendor.id,
+                      ),
                   ]);
                 },
                 child: ListView(
@@ -165,7 +165,6 @@ class _HomeBodyState extends State<_HomeBody> {
                             : const VendorStats(
                                 todayOrderCount: 0,
                                 todayRevenue: 0,
-                                cashToCollect: 0,
                               );
                         return KpiRow(stats: stats);
                       },
@@ -188,72 +187,88 @@ class _HomeBodyState extends State<_HomeBody> {
                     const SizedBox(height: 20),
                     const DashboardSectionHeader('Commandes en cours'),
                     const SizedBox(height: 10),
-                    BlocBuilder<OrdersCubit, OrdersState>(
-                      builder: (_, state) {
-                        if (state is OrdersInitial || state is OrdersLoading) {
-                          return const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 24),
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                color: AppColors.gold,
-                              ),
-                            ),
-                          );
-                        }
-                        final List<VendorOrder> active;
-                        final String? actionId;
-                        if (state is OrdersLoaded) {
-                          active = [...state.pending, ...state.validated];
-                          actionId = state.actionOrderId;
-                        } else if (state is OrdersActionError) {
-                          active = [
-                            ...state.previous.pending,
-                            ...state.previous.validated,
-                          ];
-                          actionId = null;
-                        } else {
-                          active = [];
-                          actionId = null;
-                        }
+                    BlocBuilder<VendorCubit, VendorState>(
+                      builder: (_, vendorState) {
+                        final isPending =
+                            vendorState is VendorLoaded &&
+                            vendorState.vendor.status != 'ACTIVE';
+                        if (isPending) return const PendingOrdersCard();
 
-                        if (active.isEmpty) return const EmptyOrdersCard();
-
-                        final days = _uniqueDays(active);
-                        final filtered = _selectedDay == null
-                            ? active
-                            : active
-                                  .where((o) => _orderDay(o) == _selectedDay)
-                                  .toList();
-                        final grouped = _groupByDay(filtered);
-
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Day filter chips
-                            if (days.length > 1) ...[
-                              _DayFilterBar(
-                                days: days,
-                                selected: _selectedDay,
-                                onSelect: (d) =>
-                                    setState(() => _selectedDay = d),
-                              ),
-                              const SizedBox(height: 12),
-                            ],
-                            // Grouped orders
-                            for (final entry in grouped.entries) ...[
-                              _DayHeader(label: _dayLabel(entry.key)),
-                              const SizedBox(height: 8),
-                              for (final order in entry.value)
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 10),
-                                  child: OrderCard(
-                                    order: order,
-                                    isActing: actionId == order.id,
+                        return BlocBuilder<OrdersCubit, OrdersState>(
+                          builder: (_, state) {
+                            if (state is OrdersInitial ||
+                                state is OrdersLoading) {
+                              return const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 24),
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    color: AppColors.gold,
                                   ),
                                 ),
-                              const SizedBox(height: 6),
-                            ],
-                          ],
+                              );
+                            }
+                            final List<VendorOrder> active;
+                            final String? actionId;
+                            if (state is OrdersLoaded) {
+                              active = [...state.pending, ...state.validated];
+                              actionId = state.actionOrderId;
+                            } else if (state is OrdersActionError) {
+                              active = [
+                                ...state.previous.pending,
+                                ...state.previous.validated,
+                              ];
+                              actionId = null;
+                            } else {
+                              active = [];
+                              actionId = null;
+                            }
+
+                            if (active.isEmpty) {
+                              return const EmptyOrdersCard();
+                            }
+
+                            final days = _uniqueDays(active);
+                            final filtered = _selectedDay == null
+                                ? active
+                                : active
+                                      .where(
+                                        (o) => _orderDay(o) == _selectedDay,
+                                      )
+                                      .toList();
+                            final grouped = _groupByDay(filtered);
+
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Day filter chips
+                                if (days.length > 1) ...[
+                                  _DayFilterBar(
+                                    days: days,
+                                    selected: _selectedDay,
+                                    onSelect: (d) =>
+                                        setState(() => _selectedDay = d),
+                                  ),
+                                  const SizedBox(height: 12),
+                                ],
+                                // Grouped orders
+                                for (final entry in grouped.entries) ...[
+                                  _DayHeader(label: _dayLabel(entry.key)),
+                                  const SizedBox(height: 8),
+                                  for (final order in entry.value)
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: 10,
+                                      ),
+                                      child: OrderCard(
+                                        order: order,
+                                        isActing: actionId == order.id,
+                                      ),
+                                    ),
+                                  const SizedBox(height: 6),
+                                ],
+                              ],
+                            );
+                          },
                         );
                       },
                     ),

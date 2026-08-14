@@ -32,15 +32,6 @@ class KpiRow extends StatelessWidget {
             tint: AppColors.success,
           ),
         ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: KpiCard(
-            label: 'À encaisser',
-            value: formatXof(stats.cashToCollect),
-            sub: 'FCFA cash',
-            tint: AppColors.carrot,
-          ),
-        ),
       ],
     );
   }
@@ -117,8 +108,10 @@ class KpiCard extends StatelessWidget {
           const SizedBox(height: 3),
           Text(
             sub,
-            style: AppTextStyles.body
-                .copyWith(color: AppColors.brown, fontSize: 11),
+            style: AppTextStyles.body.copyWith(
+              color: AppColors.brown,
+              fontSize: 11,
+            ),
           ),
         ],
       ),
@@ -148,6 +141,55 @@ class DashboardSectionHeader extends StatelessWidget {
   }
 }
 
+/// Shown in place of the orders section while the vendor account is not yet
+/// ACTIVE — orders are never fetched for a pending account (see
+/// AppShell._loadAll), so without this the section would spin forever.
+class PendingOrdersCard extends StatelessWidget {
+  const PendingOrdersCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 20),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A5B1E0F),
+            blurRadius: 6,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          const Icon(
+            Icons.hourglass_top_rounded,
+            color: AppColors.gold,
+            size: 40,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Compte en attente de validation',
+            style: AppTextStyles.body.copyWith(
+              color: AppColors.mute,
+              fontWeight: FontWeight.w700,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            "Vos commandes apparaîtront ici dès que l'équipe Grand Frère aura approuvé votre compte.",
+            style: AppTextStyles.caption.copyWith(color: AppColors.mute),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class EmptyOrdersCard extends StatelessWidget {
   const EmptyOrdersCard({super.key});
 
@@ -168,7 +210,11 @@ class EmptyOrdersCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const Icon(Icons.receipt_long_outlined, color: AppColors.line, size: 40),
+          const Icon(
+            Icons.receipt_long_outlined,
+            color: AppColors.line,
+            size: 40,
+          ),
           const SizedBox(height: 12),
           Text(
             'Aucune commande en cours',
