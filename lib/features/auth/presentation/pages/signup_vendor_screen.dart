@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../../core/router/routes.dart';
+import '../../../../core/auth/auth_bloc/auth_bloc.dart';
+import '../../../../core/auth/auth_bloc/auth_event.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../domain/entities/school.dart';
 import '../bloc/signup_vendor_bloc/signup_vendor_bloc.dart';
@@ -18,8 +18,9 @@ class SignupVendorScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => GetIt.instance<SignupVendorBloc>()
-        ..add(const SignupVendorLoadSchools()),
+      create: (_) =>
+          GetIt.instance<SignupVendorBloc>()
+            ..add(const SignupVendorLoadSchools()),
       child: const _SignupFlow(),
     );
   }
@@ -69,7 +70,13 @@ class _SignupFlowState extends State<_SignupFlow> {
     final password = _passwordCtrl.text;
     final wave = _waveCtrl.text.trim();
 
-    if ([firstName, lastName, shopName, phone, password].any((v) => v.isEmpty)) {
+    if ([
+      firstName,
+      lastName,
+      shopName,
+      phone,
+      password,
+    ].any((v) => v.isEmpty)) {
       AppToast.show(
         context,
         'Veuillez remplir tous les champs obligatoires.',
@@ -79,16 +86,16 @@ class _SignupFlowState extends State<_SignupFlow> {
     }
 
     context.read<SignupVendorBloc>().add(
-          SignupVendorSubmitRequested(
-            firstName: firstName,
-            lastName: lastName,
-            phone: phone.startsWith('+225') ? phone : '+225$phone',
-            password: password,
-            shopName: shopName,
-            schoolId: school.id,
-            waveNumber: wave.isEmpty ? null : wave,
-          ),
-        );
+      SignupVendorSubmitRequested(
+        firstName: firstName,
+        lastName: lastName,
+        phone: phone.startsWith('+225') ? phone : '+225$phone',
+        password: password,
+        shopName: shopName,
+        schoolId: school.id,
+        waveNumber: wave.isEmpty ? null : wave,
+      ),
+    );
   }
 
   @override
@@ -101,7 +108,16 @@ class _SignupFlowState extends State<_SignupFlow> {
       child: BlocListener<SignupVendorBloc, SignupVendorState>(
         listener: (context, state) {
           if (state is SignupVendorSuccess) {
-            context.go(Routes.pending);
+            // Log the vendor in directly instead of parking them on a
+            // dedicated "pending approval" screen — the shell already
+            // shows the right messaging (Menu open, Orders/Cashin locked)
+            // once their status comes back as not yet ACTIVE.
+            context.read<AuthBloc>().add(
+              AuthLoginRequested(
+                accessToken: state.tokens.accessToken,
+                refreshToken: state.tokens.refreshToken,
+              ),
+            );
           } else if (state is SignupVendorError) {
             AppToast.show(context, state.message, isError: true);
           }

@@ -8,7 +8,6 @@ import '../../features/auth/presentation/pages/login_screen.dart';
 import '../../features/auth/presentation/pages/signup_vendor_screen.dart';
 import '../../features/auth/presentation/pages/forgot_password_screen.dart';
 import '../../features/auth/presentation/pages/reset_password_screen.dart';
-import '../../features/auth/presentation/pages/pending_approval_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../features/balance/presentation/cubit/balance_cubit.dart';
@@ -31,14 +30,8 @@ class AppRouter {
       refreshListenable: GoRouterRefreshStream(_authBloc.stream),
       redirect: _guard,
       routes: [
-        GoRoute(
-          path: Routes.splash,
-          builder: (_, _) => const SplashScreen(),
-        ),
-        GoRoute(
-          path: Routes.login,
-          builder: (_, _) => const LoginScreen(),
-        ),
+        GoRoute(path: Routes.splash, builder: (_, _) => const SplashScreen()),
+        GoRoute(path: Routes.login, builder: (_, _) => const LoginScreen()),
         GoRoute(
           path: Routes.signup,
           builder: (_, _) => const SignupVendorScreen(),
@@ -54,18 +47,8 @@ class AppRouter {
             return ResetPasswordScreen(phone: extra.phone, code: extra.code);
           },
         ),
-        GoRoute(
-          path: Routes.pending,
-          builder: (_, _) => const PendingApprovalScreen(),
-        ),
-        GoRoute(
-          path: Routes.home,
-          builder: (_, _) => const AppShell(),
-        ),
-        GoRoute(
-          path: Routes.cashin,
-          builder: (_, _) => const CashinScreen(),
-        ),
+        GoRoute(path: Routes.home, builder: (_, _) => const AppShell()),
+        GoRoute(path: Routes.cashin, builder: (_, _) => const CashinScreen()),
         GoRoute(
           path: Routes.orderDetail,
           builder: (_, state) => BlocProvider.value(
@@ -110,13 +93,13 @@ class AppRouter {
         Routes.signup,
         Routes.forgot,
         Routes.resetPassword,
-        Routes.pending,
       };
       return authRoutes.contains(location) ? null : Routes.login;
     }
 
     if (authState is AuthAuthenticated) {
-      final isOnAuthScreen = location == Routes.login ||
+      final isOnAuthScreen =
+          location == Routes.login ||
           location == Routes.signup ||
           location == Routes.forgot ||
           location == Routes.resetPassword ||
@@ -127,4 +110,3 @@ class AppRouter {
     return null;
   }
 }
-
