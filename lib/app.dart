@@ -28,8 +28,8 @@ class _AppState extends State<App> {
     super.initState();
     _appRouter = getIt<AppRouter>();
     getIt<AuthBloc>().add(const AuthCheckRequested());
-    TokenStorage tokenStorage = getIt<TokenStorage>();
-    tokenStorage.clearTokens();
+    /* TokenStorage tokenStorage = getIt<TokenStorage>();
+    tokenStorage.clearTokens(); */
   }
 
   @override
@@ -46,6 +46,13 @@ class _AppState extends State<App> {
             if (!_pushInitialized) {
               _pushInitialized = true;
               getIt<FirebaseNotificationService>().init();
+            } else {
+              // init() (permission prompt, listeners) only ever runs once
+              // for the app's lifetime, but the FCM token itself was
+              // cleared server-side on the previous logout — resync it for
+              // this session so a logout/login cycle doesn't leave the
+              // account without push notifications until the app restarts.
+              getIt<FirebaseNotificationService>().syncToken();
             }
           } else if (state is AuthUnauthenticated) {
             context.read<VendorCubit>().reset();
@@ -68,4 +75,3 @@ class _AppState extends State<App> {
     );
   }
 }
-

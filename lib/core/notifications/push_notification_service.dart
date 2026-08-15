@@ -94,7 +94,7 @@ class FirebaseNotificationService {
     await _local.init();
 
     // Listeners must be registered unconditionally before anything that can
-    // fail (like the network call in _syncToken) — otherwise a token-sync
+    // fail (like the network call in syncToken) — otherwise a token-sync
     // error silently kills foreground display and tap handling for the rest
     // of the session.
     FirebaseMessaging.onMessage.listen(_local.show);
@@ -102,8 +102,8 @@ class FirebaseNotificationService {
       (message) => handleNotificationTap(message.data),
     );
 
-    unawaited(_syncToken());
-    _messaging.onTokenRefresh.listen((_) => _syncToken());
+    unawaited(syncToken());
+    _messaging.onTokenRefresh.listen((_) => syncToken());
 
     final initialMessage = await _messaging.getInitialMessage();
     if (initialMessage != null) {
@@ -114,7 +114,7 @@ class FirebaseNotificationService {
   /// Fire-and-forget: registering the token isn't on the critical path,
   /// mirrors how the backend treats notification side effects. Errors are
   /// swallowed here so a token-sync failure never breaks the listeners above.
-  Future<void> _syncToken() async {
+  Future<void> syncToken() async {
     try {
       if (Platform.isIOS) {
         // On iOS, FCM's getToken() calls getAPNSToken() internally, but APNS
