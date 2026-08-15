@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/auth/auth_bloc/auth_bloc.dart';
 import '../../../../core/auth/auth_bloc/auth_event.dart';
+import '../../../../core/auth/delete_account.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
@@ -126,7 +127,8 @@ class _AccountBody extends StatelessWidget {
                   _InfoTile(
                     icon: Icons.schedule_outlined,
                     label: 'Horaires',
-                    value: (vendor?.openingTime != null &&
+                    value:
+                        (vendor?.openingTime != null &&
                             vendor?.closingTime != null)
                         ? '${vendor!.openingTime} – ${vendor.closingTime}'
                         : 'Non renseignées',
@@ -156,6 +158,13 @@ class _AccountBody extends StatelessWidget {
                     label: 'Se déconnecter',
                     color: AppColors.dangerText,
                     onTap: () => _confirmLogout(ctx),
+                  ),
+                  SizedBox(height: AppSpacing.micro),
+                  _ActionTile(
+                    icon: Icons.delete_outline_rounded,
+                    label: 'Supprimer mon compte',
+                    color: AppColors.dangerText,
+                    onTap: () => confirmAndDeleteAccount(ctx),
                   ),
                 ],
               );
@@ -216,8 +225,10 @@ class _ProfileHeader extends StatelessWidget {
                     ? Center(
                         child: Text(
                           vendor?.initials ?? '?',
-                          style: AppTextStyles.h2
-                              .copyWith(color: Colors.white, fontSize: 22),
+                          style: AppTextStyles.h2.copyWith(
+                            color: Colors.white,
+                            fontSize: 22,
+                          ),
                         ),
                       )
                     : null,
@@ -311,10 +322,14 @@ class _InfoTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label,
-                    style: AppTextStyles.caption.copyWith(color: AppColors.mute)),
-                Text(value,
-                    style: AppTextStyles.body.copyWith(color: AppColors.ink)),
+                Text(
+                  label,
+                  style: AppTextStyles.caption.copyWith(color: AppColors.mute),
+                ),
+                Text(
+                  value,
+                  style: AppTextStyles.body.copyWith(color: AppColors.ink),
+                ),
               ],
             ),
           ),
@@ -356,8 +371,11 @@ class _ActionTile extends StatelessWidget {
             SizedBox(width: AppSpacing.sm),
             Text(label, style: AppTextStyles.body.copyWith(color: color)),
             const Spacer(),
-            const Icon(Icons.chevron_right_rounded,
-                color: AppColors.line, size: 20),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.line,
+              size: 20,
+            ),
           ],
         ),
       ),
@@ -445,14 +463,14 @@ class _EditProfileSheetState extends State<_EditProfileSheet> {
     final v = widget.vendor;
     await cubit.updateProfile(
       v.id,
-      shopName:
-          _shopName.text.trim().isNotEmpty ? _shopName.text.trim() : null,
-      waveNumber:
-          _wave.text.trim().isNotEmpty ? _wave.text.trim() : null,
-      openingTime:
-          _opening.text.trim().isNotEmpty ? _opening.text.trim() : null,
-      closingTime:
-          _closing.text.trim().isNotEmpty ? _closing.text.trim() : null,
+      shopName: _shopName.text.trim().isNotEmpty ? _shopName.text.trim() : null,
+      waveNumber: _wave.text.trim().isNotEmpty ? _wave.text.trim() : null,
+      openingTime: _opening.text.trim().isNotEmpty
+          ? _opening.text.trim()
+          : null,
+      closingTime: _closing.text.trim().isNotEmpty
+          ? _closing.text.trim()
+          : null,
     );
     if (mounted && cubit.state is AccountSuccess) {
       Navigator.of(context).pop();
@@ -463,58 +481,59 @@ class _EditProfileSheetState extends State<_EditProfileSheet> {
   Widget build(BuildContext context) {
     final bottom = MediaQuery.viewInsetsOf(context).bottom;
     return _SheetScaffold(
-        title: 'Modifier le profil',
-        bottom: bottom,
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              _SheetField(
-                controller: _shopName,
-                label: 'Nom de la boutique',
-                validator: (v) =>
-                    (v == null || v.trim().length < 2) ? 'Min. 2 caractères' : null,
-              ),
-              SizedBox(height: AppSpacing.sm),
-              _SheetField(
-                controller: _wave,
-                label: 'Numéro Wave',
-                hint: '+2250700000000',
-                keyboardType: TextInputType.phone,
-              ),
-              SizedBox(height: AppSpacing.sm),
-              Row(
-                children: [
-                  Expanded(
-                    child: _TimeField(
-                      controller: _opening,
-                      label: 'Ouverture',
-                      hint: '08:00',
-                      onTap: () => _pickTime(_opening),
-                    ),
+      title: 'Modifier le profil',
+      bottom: bottom,
+      child: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            _SheetField(
+              controller: _shopName,
+              label: 'Nom de la boutique',
+              validator: (v) => (v == null || v.trim().length < 2)
+                  ? 'Min. 2 caractères'
+                  : null,
+            ),
+            SizedBox(height: AppSpacing.sm),
+            _SheetField(
+              controller: _wave,
+              label: 'Numéro Wave',
+              hint: '+2250700000000',
+              keyboardType: TextInputType.phone,
+            ),
+            SizedBox(height: AppSpacing.sm),
+            Row(
+              children: [
+                Expanded(
+                  child: _TimeField(
+                    controller: _opening,
+                    label: 'Ouverture',
+                    hint: '08:00',
+                    onTap: () => _pickTime(_opening),
                   ),
-                  SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: _TimeField(
-                      controller: _closing,
-                      label: 'Fermeture',
-                      hint: '17:00',
-                      onTap: () => _pickTime(_closing),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: AppSpacing.lg),
-              BlocBuilder<AccountCubit, AccountState>(
-                builder: (_, state) => _SubmitButton(
-                  label: 'Enregistrer',
-                  isSaving: state is AccountSaving,
-                  onTap: _submit,
                 ),
+                SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: _TimeField(
+                    controller: _closing,
+                    label: 'Fermeture',
+                    hint: '17:00',
+                    onTap: () => _pickTime(_closing),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: AppSpacing.lg),
+            BlocBuilder<AccountCubit, AccountState>(
+              builder: (_, state) => _SubmitButton(
+                label: 'Enregistrer',
+                isSaving: state is AccountSaving,
+                onTap: _submit,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
     );
   }
 }
@@ -572,68 +591,68 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
   Widget build(BuildContext context) {
     final bottom = MediaQuery.viewInsetsOf(context).bottom;
     return _SheetScaffold(
-        title: 'Changer le mot de passe',
-        bottom: bottom,
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              _SheetField(
-                controller: _current,
-                label: 'Mot de passe actuel',
-                obscureText: _obscureCurrent,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscureCurrent
-                        ? Icons.visibility_outlined
-                        : Icons.visibility_off_outlined,
-                    color: AppColors.mute,
-                    size: 18,
-                  ),
-                  onPressed: () =>
-                      setState(() => _obscureCurrent = !_obscureCurrent),
+      title: 'Changer le mot de passe',
+      bottom: bottom,
+      child: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            _SheetField(
+              controller: _current,
+              label: 'Mot de passe actuel',
+              obscureText: _obscureCurrent,
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscureCurrent
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                  color: AppColors.mute,
+                  size: 18,
                 ),
-                validator: (v) =>
-                    (v == null || v.isEmpty) ? 'Champ requis' : null,
+                onPressed: () =>
+                    setState(() => _obscureCurrent = !_obscureCurrent),
               ),
-              SizedBox(height: AppSpacing.sm),
-              _SheetField(
-                controller: _newPw,
-                label: 'Nouveau mot de passe',
-                obscureText: _obscureNew,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscureNew
-                        ? Icons.visibility_outlined
-                        : Icons.visibility_off_outlined,
-                    color: AppColors.mute,
-                    size: 18,
-                  ),
-                  onPressed: () => setState(() => _obscureNew = !_obscureNew),
+              validator: (v) =>
+                  (v == null || v.isEmpty) ? 'Champ requis' : null,
+            ),
+            SizedBox(height: AppSpacing.sm),
+            _SheetField(
+              controller: _newPw,
+              label: 'Nouveau mot de passe',
+              obscureText: _obscureNew,
+              suffixIcon: IconButton(
+                icon: Icon(
+                  _obscureNew
+                      ? Icons.visibility_outlined
+                      : Icons.visibility_off_outlined,
+                  color: AppColors.mute,
+                  size: 18,
                 ),
-                validator: (v) =>
-                    (v == null || v.length < 8) ? 'Min. 8 caractères' : null,
+                onPressed: () => setState(() => _obscureNew = !_obscureNew),
               ),
-              SizedBox(height: AppSpacing.sm),
-              _SheetField(
-                controller: _confirm,
-                label: 'Confirmer le nouveau mot de passe',
-                obscureText: true,
-                validator: (v) => v != _newPw.text
-                    ? 'Les mots de passe ne correspondent pas'
-                    : null,
+              validator: (v) =>
+                  (v == null || v.length < 8) ? 'Min. 8 caractères' : null,
+            ),
+            SizedBox(height: AppSpacing.sm),
+            _SheetField(
+              controller: _confirm,
+              label: 'Confirmer le nouveau mot de passe',
+              obscureText: true,
+              validator: (v) => v != _newPw.text
+                  ? 'Les mots de passe ne correspondent pas'
+                  : null,
+            ),
+            SizedBox(height: AppSpacing.lg),
+            BlocBuilder<AccountCubit, AccountState>(
+              builder: (_, state) => _SubmitButton(
+                label: 'Confirmer',
+                isSaving: state is AccountSaving,
+                onTap: _submit,
               ),
-              SizedBox(height: AppSpacing.lg),
-              BlocBuilder<AccountCubit, AccountState>(
-                builder: (_, state) => _SubmitButton(
-                  label: 'Confirmer',
-                  isSaving: state is AccountSaving,
-                  onTap: _submit,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
     );
   }
 }
@@ -686,8 +705,11 @@ class _TimeField extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const Icon(Icons.schedule_outlined,
-                      color: AppColors.mute, size: 16),
+                  const Icon(
+                    Icons.schedule_outlined,
+                    color: AppColors.mute,
+                    size: 16,
+                  ),
                 ],
               ),
             ),

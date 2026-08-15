@@ -16,18 +16,18 @@ class SchoolModel {
   final bool popular;
 
   factory SchoolModel.fromJson(Map<String, dynamic> json) => SchoolModel(
-        id: json['id'] as String,
-        name: json['name'] as String,
-        sigle: json['sigle'] as String,
-        address: json['address'] as String,
-        popular: json['popular'] as bool? ?? false,
-      );
+    id: json['id'] as String,
+    name: json['name'] as String,
+    sigle: json['sigle'] as String,
+    address: json['address'] as String,
+    popular: json['popular'] as bool? ?? false,
+  );
 
   School toDomain() => School(
-        id: id,
-        name: name,
-        sigle: sigle,
-        address: address,
-        popular: popular,
-      );
+    id: id,
+    name: name,
+    sigle: sigle,
+    address: address,
+    popular: popular,
+  );
 }

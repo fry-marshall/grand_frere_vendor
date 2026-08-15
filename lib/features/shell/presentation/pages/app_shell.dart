@@ -21,6 +21,7 @@ import '../../../vendor/presentation/cubit/vendor_cubit.dart';
 import '../../../vendor/presentation/cubit/vendor_state.dart';
 import '../../../vendor/presentation/pages/account_screen.dart';
 import '../../../vendor/presentation/pages/home_screen.dart';
+import '../widgets/vendor_blocked_screen.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -50,6 +51,10 @@ class _AppShellState extends State<AppShell> {
   }
 
   void _loadAll(Vendor vendor) {
+    // A rejected/suspended vendor sees the blocked screen instead of the
+    // shell — no tab data to fetch.
+    if (vendor.status == 'REJECTED' || vendor.status == 'SUSPENDED') return;
+
     // Orders/cashin are rejected by the API until the vendor is ACTIVE —
     // skip the doomed call so the Orders tab doesn't flash an error state.
     if (vendor.status == 'ACTIVE') {
@@ -82,17 +87,27 @@ class _AppShellState extends State<AppShell> {
       child: BlocBuilder<VendorCubit, VendorState>(
         bloc: getIt<VendorCubit>(),
         builder: (context, vendorState) {
+          if (vendorState is VendorLoaded) {
+            final status = vendorState.vendor.status;
+            if (status == 'REJECTED' || status == 'SUSPENDED') {
+              return VendorBlockedScreen(rejected: status == 'REJECTED');
+            }
+          }
+
           // While the vendor profile is still loading, keep showing the
           // orders screen (it has its own spinner) rather than flashing the
           // locked state for an ACTIVE vendor whose profile just isn't in
           // yet. Once VendorLoaded resolves, this rebuilds with the real
           // status.
           final isPending =
-              vendorState is VendorLoaded && vendorState.vendor.status != 'ACTIVE';
+              vendorState is VendorLoaded &&
+              vendorState.vendor.status != 'ACTIVE';
 
           final tabs = [
             const HomeScreen(),
-            isPending ? const OrdersPendingApprovalState() : const OrdersScreen(),
+            isPending
+                ? const OrdersPendingApprovalState()
+                : const OrdersScreen(),
             const MenuScreen(),
             const AccountScreen(),
           ];
@@ -115,7 +130,6 @@ class _AppShellState extends State<AppShell> {
     );
   }
 }
-
 
 // ── FAB Encaisser ─────────────────────────────────────────────────────────────
 
@@ -142,18 +156,17 @@ class _EncaisserFab extends StatelessWidget {
               blurRadius: 26,
               offset: Offset(0, 10),
             ),
-            BoxShadow(
-              color: Color(0x2EE8B54A),
-              blurRadius: 0,
-              spreadRadius: 4,
-            ),
+            BoxShadow(color: Color(0x2EE8B54A), blurRadius: 0, spreadRadius: 4),
           ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.qr_code_scanner_rounded,
-                color: Colors.white, size: 18),
+            const Icon(
+              Icons.qr_code_scanner_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
             const SizedBox(width: 8),
             Text(
               'Encaisser',

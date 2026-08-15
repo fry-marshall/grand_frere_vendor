@@ -28,8 +28,8 @@ class _AppState extends State<App> {
     super.initState();
     _appRouter = getIt<AppRouter>();
     getIt<AuthBloc>().add(const AuthCheckRequested());
-    /* TokenStorage tokenStorage = getIt<TokenStorage>();
-    tokenStorage.clearTokens(); */
+    TokenStorage tokenStorage = getIt<TokenStorage>();
+    tokenStorage.clearTokens();
   }
 
   @override

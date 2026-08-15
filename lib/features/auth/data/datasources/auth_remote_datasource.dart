@@ -31,6 +31,8 @@ abstract class AuthRemoteDataSource {
   });
 
   Future<void> updateFcmToken(String? fcmToken);
+
+  Future<void> deleteAccount();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -112,5 +114,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> updateFcmToken(String? fcmToken) async {
     await _client.put('/auth/fcm-token', data: {'fcmToken': fcmToken});
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    await _client.delete('/auth/me');
   }
 }

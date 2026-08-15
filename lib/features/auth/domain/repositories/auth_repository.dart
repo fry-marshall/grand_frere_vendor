@@ -34,4 +34,7 @@ abstract class AuthRepository {
 
   /// Registers (or clears, when `null`) the FCM push token for the current user.
   Future<Either<Failure, void>> updateFcmToken(String? fcmToken);
+
+  /// Soft-deletes the current account and closes off its login.
+  Future<Either<Failure, void>> deleteAccount();
 }

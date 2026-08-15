@@ -15,8 +15,6 @@ class AuthTokensModel {
         refreshToken: json['refreshToken'] as String,
       );
 
-  AuthTokens toDomain() => AuthTokens(
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-      );
+  AuthTokens toDomain() =>
+      AuthTokens(accessToken: accessToken, refreshToken: refreshToken);
 }
