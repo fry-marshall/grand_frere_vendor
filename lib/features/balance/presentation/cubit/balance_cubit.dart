@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/error/failure.dart';
 import '../../domain/repositories/balance_repository.dart';
 import 'balance_state.dart';
 
@@ -48,11 +49,22 @@ class BalanceCubit extends Cubit<BalanceState> {
       waveNumber: waveNumber,
     );
     await result.fold(
-      (f) async =>
-          emit(BalanceActionError(message: f.message, previous: loaded)),
+      (f) async => emit(
+        BalanceActionError(
+          message: _mapCreateWithdrawalFailure(f),
+          previous: loaded,
+        ),
+      ),
       (_) => load(_vendorId!),
     );
   }
+
+  String _mapCreateWithdrawalFailure(Failure f) => switch (f.message) {
+    'Insufficient vendor wallet balance' =>
+      'Solde insuffisant pour ce retrait.',
+    'Vendor wallet not found' => "Aucun solde disponible pour l'instant.",
+    _ => f.message,
+  };
 
   void dismissError() {
     final current = state;
