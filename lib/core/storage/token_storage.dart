@@ -3,7 +3,13 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class TokenStorage {
-  static const _storage = FlutterSecureStorage();
+  // resetOnError: on Android, Auto Backup can restore the encrypted prefs
+  // onto a new install/device without the Keystore key that encrypted them —
+  // every read then throws. Wiping the storage turns that into a plain
+  // logged-out state instead of an exception on every launch.
+  static const _storage = FlutterSecureStorage(
+    aOptions: AndroidOptions(resetOnError: true),
+  );
   static const _accessKey = 'access_token';
   static const _refreshKey = 'refresh_token';
   static const _roleKey = 'user_role';

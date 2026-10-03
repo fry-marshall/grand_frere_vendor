@@ -32,8 +32,18 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(const AuthLoading());
-    final token = await _tokenStorage.getAccessToken();
-    final roleStr = await _tokenStorage.getRole();
+    final String? token;
+    final String? roleStr;
+    try {
+      token = await _tokenStorage.getAccessToken();
+      roleStr = await _tokenStorage.getRole();
+    } catch (_) {
+      // An unreadable secure storage must not leave the app stuck on the
+      // splash in AuthLoading forever — fall back to the login screen.
+      await _tokenStorage.clearTokens().catchError((_) {});
+      emit(const AuthUnauthenticated());
+      return;
+    }
     if (token == null || roleStr == null) {
       emit(const AuthUnauthenticated());
       return;
