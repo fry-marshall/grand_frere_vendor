@@ -5,6 +5,7 @@ import '../../../../core/di/injection.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../balance/presentation/cubit/balance_cubit.dart';
 import '../../../orders/presentation/cubit/orders_cubit.dart';
+import '../../../vendor/presentation/cubit/dashboard_cubit.dart';
 import '../cubit/cashin_cubit.dart';
 import '../cubit/cashin_state.dart';
 import '../widgets/cashin_code_view.dart';
@@ -56,6 +57,7 @@ class _CashinOrchestratorState extends State<_CashinOrchestrator> {
         if (state is CashinCompleted) {
           getIt<OrdersCubit>().refresh();
           getIt<BalanceCubit>().refresh();
+          getIt<DashboardCubit>().refresh();
         }
       },
       child: BlocBuilder<CashinCubit, CashinState>(
