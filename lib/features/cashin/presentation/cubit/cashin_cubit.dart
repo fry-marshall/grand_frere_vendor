@@ -35,11 +35,9 @@ class CashinCubit extends Cubit<CashinState> {
     final orderResult = await _repo.getOrderByCard(cardCode);
     orderResult.fold(
       (f) => emit(
-        CashinError(
-          f.message == 'Order not found'
-              ? 'Aucune commande en attente pour cet élève.'
-              : f.message,
-        ),
+        f.message == 'Order not found'
+            ? CashinNoOrderForCard(cardCode)
+            : CashinError(f.message),
       ),
       (order) => emit(CashinOrderFound(order)),
     );

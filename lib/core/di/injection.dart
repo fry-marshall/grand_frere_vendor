@@ -17,6 +17,10 @@ import '../../features/auth/presentation/bloc/forgot_password_bloc/forgot_passwo
 import '../../features/auth/presentation/bloc/login_bloc/login_bloc.dart';
 import '../../features/auth/presentation/bloc/reset_password_bloc/reset_password_bloc.dart';
 import '../../features/auth/presentation/bloc/signup_vendor_bloc/signup_vendor_bloc.dart';
+import '../../features/counter/data/datasources/counter_remote_datasource.dart';
+import '../../features/counter/data/repositories/counter_repository_impl.dart';
+import '../../features/counter/domain/repositories/counter_repository.dart';
+import '../../features/counter/presentation/cubit/counter_cubit.dart';
 import '../../features/cashin/data/datasources/cashin_remote_datasource.dart';
 import '../../features/cashin/data/repositories/cashin_repository_impl.dart';
 import '../../features/cashin/domain/repositories/cashin_repository.dart';
@@ -70,6 +74,14 @@ void configureDependencies() {
   );
   getIt.registerLazySingleton<SchoolRepository>(
     () => SchoolRepositoryImpl(getIt<SchoolRemoteDataSource>()),
+  );
+
+  // ── Counter sale ──────────────────────────────────────────────────────────
+  getIt.registerLazySingleton<CounterRemoteDataSource>(
+    () => CounterRemoteDataSourceImpl(getIt<ApiClient>()),
+  );
+  getIt.registerLazySingleton<CounterRepository>(
+    () => CounterRepositoryImpl(getIt<CounterRemoteDataSource>()),
   );
 
   // ── Cashin ────────────────────────────────────────────────────────────────
@@ -151,4 +163,5 @@ void configureDependencies() {
   getIt.registerFactory(() => ForgotPasswordBloc(getIt<AuthRepository>()));
   getIt.registerFactory(() => ResetPasswordBloc(getIt<AuthRepository>()));
   getIt.registerFactory(() => CashinCubit(getIt<CashinRepository>()));
+  getIt.registerFactory(() => CounterCubit(getIt<CounterRepository>()));
 }

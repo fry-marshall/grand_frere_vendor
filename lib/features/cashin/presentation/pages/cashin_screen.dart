@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/di/injection.dart';
+import '../../../../core/router/routes.dart';
 import '../../../../core/widgets/app_toast.dart';
 import '../../../balance/presentation/cubit/balance_cubit.dart';
 import '../../../orders/presentation/cubit/orders_cubit.dart';
@@ -10,6 +12,7 @@ import '../cubit/cashin_cubit.dart';
 import '../cubit/cashin_state.dart';
 import '../widgets/cashin_code_view.dart';
 import '../widgets/cashin_confirm_view.dart';
+import '../widgets/cashin_no_order_view.dart';
 import '../widgets/cashin_pick_view.dart';
 import '../widgets/cashin_scan_view.dart';
 import '../widgets/cashin_success_view.dart';
@@ -64,6 +67,20 @@ class _CashinOrchestratorState extends State<_CashinOrchestrator> {
         builder: (_, state) {
           if (state is CashinCompleted) {
             return CashinSuccessView(order: state.order);
+          }
+
+          if (state is CashinNoOrderForCard) {
+            return CashinNoOrderView(
+              onCounterSale: () => context.pushReplacement(
+                Routes.counter,
+                extra: state.cardCode,
+              ),
+              onRescan: () {
+                context.read<CashinCubit>().reset();
+                _goScan();
+              },
+              onBack: _reset,
+            );
           }
 
           if (state is CashinOrderFound || state is CashinCompleting) {

@@ -15,6 +15,7 @@ import '../../features/balance/presentation/pages/balance_screen.dart';
 import '../../features/notifications/presentation/cubit/notifications_cubit.dart';
 import '../../features/notifications/presentation/pages/notifications_screen.dart';
 import '../../features/cashin/presentation/pages/cashin_screen.dart';
+import '../../features/counter/presentation/pages/counter_screen.dart';
 import '../../features/orders/domain/entities/vendor_order.dart';
 import '../../features/orders/presentation/cubit/orders_cubit.dart';
 import '../../features/orders/presentation/pages/order_detail_screen.dart';
@@ -49,6 +50,11 @@ class AppRouter {
         ),
         GoRoute(path: Routes.home, builder: (_, _) => const AppShell()),
         GoRoute(path: Routes.cashin, builder: (_, _) => const CashinScreen()),
+        GoRoute(
+          path: Routes.counter,
+          builder: (_, state) =>
+              CounterScreen(initialCardCode: state.extra as String?),
+        ),
         GoRoute(
           path: Routes.orderDetail,
           builder: (_, state) => BlocProvider.value(
