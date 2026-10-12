@@ -1,5 +1,6 @@
 import '../../../vendor/domain/entities/vendor_balance.dart';
 import '../../domain/entities/vendor_withdrawal.dart';
+import '../../domain/entities/wallet_movement.dart';
 
 sealed class BalanceState {}
 
@@ -11,21 +12,25 @@ class BalanceLoaded extends BalanceState {
   BalanceLoaded({
     required this.balance,
     required this.withdrawals,
+    required this.movements,
     this.isCreating = false,
   });
 
   final VendorBalance balance;
   final List<VendorWithdrawal> withdrawals;
+  final List<WalletMovement> movements;
   final bool isCreating;
 
   BalanceLoaded copyWith({
     VendorBalance? balance,
     List<VendorWithdrawal>? withdrawals,
+    List<WalletMovement>? movements,
     bool? isCreating,
   }) {
     return BalanceLoaded(
       balance: balance ?? this.balance,
       withdrawals: withdrawals ?? this.withdrawals,
+      movements: movements ?? this.movements,
       isCreating: isCreating ?? this.isCreating,
     );
   }

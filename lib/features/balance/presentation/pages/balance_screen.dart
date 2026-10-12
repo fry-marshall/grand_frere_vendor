@@ -14,6 +14,7 @@ import '../../../vendor/presentation/cubit/vendor_cubit.dart';
 import '../../../vendor/presentation/cubit/vendor_state.dart';
 import '../cubit/balance_cubit.dart';
 import '../cubit/balance_state.dart';
+import '../widgets/wallet_movement_card.dart';
 import '../widgets/withdrawal_card.dart';
 import '../widgets/withdrawal_form_sheet.dart';
 
@@ -50,8 +51,11 @@ class BalanceScreen extends StatelessWidget {
           actions: [
             BlocBuilder<BalanceCubit, BalanceState>(
               builder: (_, state) => IconButton(
-                icon: const Icon(Icons.refresh_rounded,
-                    color: AppColors.maroon, size: 22),
+                icon: const Icon(
+                  Icons.refresh_rounded,
+                  color: AppColors.maroon,
+                  size: 22,
+                ),
                 onPressed: state is BalanceLoading
                     ? null
                     : () => context.read<BalanceCubit>().refresh(),
@@ -96,10 +100,8 @@ class BalanceScreen extends StatelessWidget {
                 children: [
                   _BalanceHeader(
                     balance: loaded.balance.balance,
-                    onWithdraw: () => WithdrawalFormSheet.show(
-                      ctx,
-                      waveNumber: waveNumber,
-                    ),
+                    onWithdraw: () =>
+                        WithdrawalFormSheet.show(ctx, waveNumber: waveNumber),
                   ),
                   SizedBox(height: AppSpacing.xl),
                   Row(
@@ -121,8 +123,9 @@ class BalanceScreen extends StatelessWidget {
                           ),
                           child: Text(
                             '${loaded.withdrawals.length}',
-                            style: AppTextStyles.label
-                                .copyWith(color: AppColors.brown),
+                            style: AppTextStyles.label.copyWith(
+                              color: AppColors.brown,
+                            ),
                           ),
                         ),
                       ],
@@ -130,10 +133,23 @@ class BalanceScreen extends StatelessWidget {
                   ),
                   SizedBox(height: AppSpacing.sm),
                   if (loaded.withdrawals.isEmpty)
-                    _EmptyWithdrawals()
+                    const _EmptyList(message: 'Aucun retrait pour le moment')
                   else
-                    ...loaded.withdrawals
-                        .map((w) => WithdrawalCard(withdrawal: w)),
+                    ...loaded.withdrawals.map(
+                      (w) => WithdrawalCard(withdrawal: w),
+                    ),
+                  SizedBox(height: AppSpacing.xl),
+                  Text(
+                    'Mouvements du solde',
+                    style: AppTextStyles.h3.copyWith(color: AppColors.ink),
+                  ),
+                  SizedBox(height: AppSpacing.sm),
+                  if (loaded.movements.isEmpty)
+                    const _EmptyList(message: 'Aucun mouvement pour le moment')
+                  else
+                    ...loaded.movements.map(
+                      (m) => WalletMovementCard(movement: m),
+                    ),
                 ],
               ),
             );
@@ -145,10 +161,7 @@ class BalanceScreen extends StatelessWidget {
 }
 
 class _BalanceHeader extends StatelessWidget {
-  const _BalanceHeader({
-    required this.balance,
-    required this.onWithdraw,
-  });
+  const _BalanceHeader({required this.balance, required this.onWithdraw});
 
   final int balance;
   final VoidCallback onWithdraw;
@@ -224,8 +237,9 @@ class _BalanceHeader extends StatelessWidget {
                   SizedBox(width: AppSpacing.xs),
                   Text(
                     'Demander un retrait',
-                    style: AppTextStyles.buttonSmall
-                        .copyWith(color: Colors.white),
+                    style: AppTextStyles.buttonSmall.copyWith(
+                      color: Colors.white,
+                    ),
                   ),
                 ],
               ),
@@ -237,7 +251,10 @@ class _BalanceHeader extends StatelessWidget {
   }
 }
 
-class _EmptyWithdrawals extends StatelessWidget {
+class _EmptyList extends StatelessWidget {
+  const _EmptyList({required this.message});
+  final String message;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -247,7 +264,7 @@ class _EmptyWithdrawals extends StatelessWidget {
           const Icon(Icons.history_rounded, color: AppColors.line, size: 44),
           SizedBox(height: AppSpacing.sm),
           Text(
-            'Aucun retrait pour le moment',
+            message,
             style: AppTextStyles.body.copyWith(color: AppColors.mute),
           ),
         ],
@@ -290,8 +307,9 @@ class _ErrorState extends StatelessWidget {
                 ),
                 child: Text(
                   'Réessayer',
-                  style: AppTextStyles.buttonSmall
-                      .copyWith(color: AppColors.brown),
+                  style: AppTextStyles.buttonSmall.copyWith(
+                    color: AppColors.brown,
+                  ),
                 ),
               ),
             ),

@@ -16,8 +16,10 @@ class BalanceCubit extends Cubit<BalanceState> {
 
     final balanceFuture = _repo.getBalance(vendorId);
     final withdrawalsFuture = _repo.getWithdrawals(vendorId);
+    final movementsFuture = _repo.getMovements(vendorId);
     final balanceResult = await balanceFuture;
     final withdrawalsResult = await withdrawalsFuture;
+    final movementsResult = await movementsFuture;
 
     if (balanceResult.isLeft()) {
       emit(BalanceError(balanceResult.fold((f) => f.message, (_) => '')));
@@ -28,6 +30,7 @@ class BalanceCubit extends Cubit<BalanceState> {
       BalanceLoaded(
         balance: balanceResult.getRight().toNullable()!,
         withdrawals: withdrawalsResult.getRight().toNullable() ?? [],
+        movements: movementsResult.getRight().toNullable() ?? [],
       ),
     );
   }
