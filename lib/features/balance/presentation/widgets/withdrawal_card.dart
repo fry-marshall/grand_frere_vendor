@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../domain/entities/vendor_withdrawal.dart';
+import '../utils/time_ago.dart';
 
 class WithdrawalCard extends StatelessWidget {
   const WithdrawalCard({super.key, required this.withdrawal});
@@ -40,14 +41,6 @@ class WithdrawalCard extends StatelessWidget {
     return Icons.error_outline_rounded;
   }
 
-  String _timeAgo() {
-    final diff = DateTime.now().difference(withdrawal.createdAt);
-    if (diff.inMinutes < 60) return 'il y a ${diff.inMinutes} min';
-    if (diff.inHours < 24) return 'il y a ${diff.inHours} h';
-    if (diff.inDays < 30) return 'il y a ${diff.inDays} j';
-    return '${withdrawal.createdAt.day}/${withdrawal.createdAt.month}/${withdrawal.createdAt.year}';
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -79,7 +72,7 @@ class WithdrawalCard extends StatelessWidget {
                   style: AppTextStyles.body.copyWith(color: AppColors.ink),
                 ),
                 Text(
-                  _timeAgo(),
+                  timeAgo(withdrawal.createdAt),
                   style: AppTextStyles.caption.copyWith(color: AppColors.mute),
                 ),
               ],

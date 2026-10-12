@@ -4,6 +4,7 @@ import '../../../../core/error/failure.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../vendor/domain/entities/vendor_balance.dart';
 import '../../domain/entities/vendor_withdrawal.dart';
+import '../../domain/entities/wallet_movement.dart';
 import '../../domain/repositories/balance_repository.dart';
 import '../datasources/balance_remote_datasource.dart';
 
@@ -35,6 +36,18 @@ class BalanceRepositoryImpl implements BalanceRepository {
   }
 
   @override
+  Future<Either<Failure, List<WalletMovement>>> getMovements(
+    String vendorId,
+  ) async {
+    try {
+      return Right(await _ds.getMovements(vendorId));
+    } on ApiException catch (e) {
+      if (e.isNetworkError) return const Left(NetworkFailure());
+      return Left(ServerFailure(e.firstMessage));
+    }
+  }
+
+  @override
   Future<Either<Failure, VendorWithdrawal>> createWithdrawal(
     String vendorId, {
     required int amount,
@@ -42,7 +55,11 @@ class BalanceRepositoryImpl implements BalanceRepository {
   }) async {
     try {
       return Right(
-        await _ds.createWithdrawal(vendorId, amount: amount, waveNumber: waveNumber),
+        await _ds.createWithdrawal(
+          vendorId,
+          amount: amount,
+          waveNumber: waveNumber,
+        ),
       );
     } on ApiException catch (e) {
       if (e.isNetworkError) return const Left(NetworkFailure());

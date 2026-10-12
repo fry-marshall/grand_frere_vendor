@@ -9,8 +9,10 @@ class DashboardCubit extends Cubit<DashboardState> {
   DashboardCubit(this._repo) : super(const DashboardInitial());
 
   final VendorRepository _repo;
+  String? _vendorId;
 
   Future<void> load(String vendorId) async {
+    _vendorId = vendorId;
     emit(const DashboardLoading());
 
     final statsFuture = _repo.getStats(vendorId);
@@ -30,5 +32,9 @@ class DashboardCubit extends Cubit<DashboardState> {
     } else {
       emit(DashboardLoaded(stats: stats, balance: balance));
     }
+  }
+
+  Future<void> refresh() async {
+    if (_vendorId != null) await load(_vendorId!);
   }
 }
