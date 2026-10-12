@@ -1,4 +1,3 @@
-import '../../domain/entities/vendor_balance.dart';
 import '../../domain/entities/vendor_stats.dart';
 
 sealed class DashboardState {
@@ -14,9 +13,8 @@ class DashboardLoading extends DashboardState {
 }
 
 class DashboardLoaded extends DashboardState {
-  const DashboardLoaded({required this.stats, required this.balance});
+  const DashboardLoaded({required this.stats});
   final VendorStats stats;
-  final VendorBalance balance;
 }
 
 class DashboardError extends DashboardState {

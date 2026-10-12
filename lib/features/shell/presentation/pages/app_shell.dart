@@ -30,13 +30,19 @@ class AppShell extends StatefulWidget {
   State<AppShell> createState() => _AppShellState();
 }
 
-class _AppShellState extends State<AppShell> {
+class _AppShellState extends State<AppShell> with WidgetsBindingObserver {
+  /// Below this, coming back to the app doesn't refetch (e.g. a quick
+  /// glance at another app) to avoid flashing loaders for nothing.
+  static const _staleAfter = Duration(seconds: 30);
+
   int _index = 0;
   StreamSubscription<VendorState>? _vendorSub;
+  DateTime? _backgroundedAt;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     final vendorCubit = getIt<VendorCubit>();
 
     // Check current state immediately (vendor may already be loaded)
@@ -66,8 +72,31 @@ class _AppShellState extends State<AppShell> {
     getIt<DashboardCubit>().load(vendor.id);
   }
 
+  /// Balance, orders and KPIs can change while the app is in background
+  /// (refund by an admin, cashin from another device), so they're refetched
+  /// when the vendor comes back.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _backgroundedAt = DateTime.now();
+      return;
+    }
+    if (state != AppLifecycleState.resumed) return;
+
+    final backgroundedAt = _backgroundedAt;
+    _backgroundedAt = null;
+    if (backgroundedAt == null ||
+        DateTime.now().difference(backgroundedAt) < _staleAfter) {
+      return;
+    }
+
+    final vendorState = getIt<VendorCubit>().state;
+    if (vendorState is VendorLoaded) _loadAll(vendorState.vendor);
+  }
+
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _vendorSub?.cancel();
     super.dispose();
   }
