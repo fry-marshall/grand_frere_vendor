@@ -1,7 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../domain/entities/vendor_balance.dart';
-import '../../domain/entities/vendor_stats.dart';
 import '../../domain/repositories/vendor_repository.dart';
 import 'dashboard_state.dart';
 
@@ -11,27 +9,17 @@ class DashboardCubit extends Cubit<DashboardState> {
   final VendorRepository _repo;
   String? _vendorId;
 
+  /// Today's KPIs only — the balance lives in BalanceCubit, the single
+  /// source for both the home card and the balance screen.
   Future<void> load(String vendorId) async {
     _vendorId = vendorId;
     emit(const DashboardLoading());
 
-    final statsFuture = _repo.getStats(vendorId);
-    final balanceFuture = _repo.getBalance(vendorId);
-
-    final statsResult = await statsFuture;
-    final balanceResult = await balanceFuture;
-
-    final VendorStats? stats = statsResult.fold((_) => null, (s) => s);
-    final VendorBalance? balance = balanceResult.fold((_) => null, (b) => b);
-
-    if (stats == null || balance == null) {
-      final msg = statsResult.isLeft()
-          ? statsResult.fold((f) => f.message, (_) => 'Erreur.')
-          : balanceResult.fold((f) => f.message, (_) => 'Erreur.');
-      emit(DashboardError(msg));
-    } else {
-      emit(DashboardLoaded(stats: stats, balance: balance));
-    }
+    final result = await _repo.getStats(vendorId);
+    result.fold(
+      (f) => emit(DashboardError(f.message)),
+      (stats) => emit(DashboardLoaded(stats: stats)),
+    );
   }
 
   Future<void> refresh() async {

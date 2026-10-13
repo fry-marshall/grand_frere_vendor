@@ -12,6 +12,7 @@ abstract class Routes {
   static const menu = '/vendor/menu';
   static const account = '/vendor/account';
   static const cashin = '/cashin';
+  static const counter = '/counter';
   static const orderDetail = '/vendor/orders/:id';
   static const balance = '/vendor/balance';
   static const notifications = '/vendor/notifications';

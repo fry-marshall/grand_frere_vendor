@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/di/injection.dart';
+import '../../../../core/router/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_shadows.dart';
@@ -89,6 +90,18 @@ class _CashinPickViewState extends State<CashinPickView> {
               title: 'Saisir le n° de commande',
               description: "Tape les 4 chiffres dictés par l'élève.",
               onTap: widget.onCode,
+            ),
+            SizedBox(height: AppSpacing.sm),
+            _OptionCard(
+              badge: 'SANS COMMANDE',
+              badgeColor: AppColors.successText,
+              icon: Icons.storefront_rounded,
+              iconBg: AppColors.successSurface,
+              iconColor: AppColors.successText,
+              title: 'Vente au comptoir',
+              description:
+                  "Scanne la carte, choisis les articles, l'élève paie tout de suite.",
+              onTap: () => context.push(Routes.counter),
             ),
             SizedBox(height: AppSpacing.xl),
             _PendingOrdersSection(future: _pendingFuture),
