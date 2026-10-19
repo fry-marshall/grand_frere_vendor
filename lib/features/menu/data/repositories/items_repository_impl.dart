@@ -25,11 +25,12 @@ class ItemsRepositoryImpl implements ItemsRepository {
     String vendorId, {
     required String name,
     required int price,
+    int? step,
     String? description,
   }) async {
     try {
       return Right(
-        await _ds.createItem(vendorId, name: name, price: price, description: description),
+        await _ds.createItem(vendorId, name: name, price: price, step: step, description: description),
       );
     } on ApiException catch (e) {
       if (e.isNetworkError) return const Left(NetworkFailure());
@@ -42,12 +43,13 @@ class ItemsRepositoryImpl implements ItemsRepository {
     String id, {
     String? name,
     int? price,
+    int? step,
     String? description,
     String? status,
   }) async {
     try {
       return Right(
-        await _ds.updateItem(id, name: name, price: price, description: description, status: status),
+        await _ds.updateItem(id, name: name, price: price, step: step, description: description, status: status),
       );
     } on ApiException catch (e) {
       if (e.isNetworkError) return const Left(NetworkFailure());

@@ -3,6 +3,7 @@ import 'package:fpdart/fpdart.dart';
 import '../../../../core/error/failure.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../domain/entities/counter_preview.dart';
+import '../../domain/entities/counter_sale.dart';
 import '../../domain/repositories/counter_repository.dart';
 import '../datasources/counter_remote_datasource.dart';
 
@@ -21,16 +22,16 @@ class CounterRepositoryImpl implements CounterRepository {
   }
 
   @override
-  Future<Either<Failure, int>> sell({
+  Future<Either<Failure, CounterSale>> sell({
     required String cardCode,
-    required Map<String, int> quantities,
+    required List<({String itemId, int quantity, int? amount})> lines,
     required String pin,
   }) async {
     try {
       return Right(
         await _remote.sell(
           cardCode: cardCode,
-          quantities: quantities,
+          lines: lines,
           pin: pin,
         ),
       );

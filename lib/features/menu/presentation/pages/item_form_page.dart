@@ -37,6 +37,7 @@ class ItemFormPage extends StatefulWidget {
 class _ItemFormPageState extends State<ItemFormPage> {
   late final TextEditingController _name;
   late final TextEditingController _price;
+  late final TextEditingController _step;
   late final TextEditingController _description;
   final _formKey = GlobalKey<FormState>();
   bool _saving = false;
@@ -51,6 +52,11 @@ class _ItemFormPageState extends State<ItemFormPage> {
     _price = TextEditingController(
       text: widget.item != null ? widget.item!.price.toString() : '',
     );
+    _step = TextEditingController(
+      text: widget.item != null && widget.item!.isVariablePrice
+          ? widget.item!.step.toString()
+          : '',
+    );
     _description = TextEditingController(text: widget.item?.description ?? '');
   }
 
@@ -58,6 +64,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
   void dispose() {
     _name.dispose();
     _price.dispose();
+    _step.dispose();
     _description.dispose();
     super.dispose();
   }
@@ -119,6 +126,8 @@ class _ItemFormPageState extends State<ItemFormPage> {
     final cubit = context.read<ItemsCubit>();
     final name = _name.text.trim();
     final price = int.parse(_price.text.trim());
+    // Empty step: fixed price (step = price), the item is sold by quantity.
+    final step = int.tryParse(_step.text.trim()) ?? price;
     final description = _description.text.trim();
 
     if (isEdit) {
@@ -126,6 +135,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
         widget.item!.id,
         name: name,
         price: price,
+        step: step,
         description: description.isNotEmpty
             ? description
             : null,
@@ -138,6 +148,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
       await cubit.createItem(
         name: name,
         price: price,
+        step: step,
         description: description.isNotEmpty ? description : null,
         imagePath: _pickedImage?.path,
       );
@@ -194,7 +205,7 @@ class _ItemFormPageState extends State<ItemFormPage> {
               SizedBox(height: AppSpacing.sm),
               _Field(
                 controller: _price,
-                label: 'Prix (FCFA)',
+                label: 'Prix minimum (FCFA)',
                 hint: '1 500',
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -204,6 +215,26 @@ class _ItemFormPageState extends State<ItemFormPage> {
                   if (n == null || n < 1) return 'Prix invalide';
                   return null;
                 },
+              ),
+              SizedBox(height: AppSpacing.sm),
+              _Field(
+                controller: _step,
+                label: 'Pas (FCFA, optionnel)',
+                hint: '25',
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                validator: (v) {
+                  if (v == null || v.trim().isEmpty) return null;
+                  final n = int.tryParse(v.trim());
+                  if (n == null || n < 1) return 'Pas invalide';
+                  return null;
+                },
+              ),
+              SizedBox(height: AppSpacing.xs),
+              Text(
+                'Ex : prix minimum 50 et pas de 25 → l\'élève peut prendre '
+                '50, 75, 100… Laissez vide pour un prix fixe, vendu à la quantité.',
+                style: AppTextStyles.caption.copyWith(color: AppColors.mute),
               ),
               SizedBox(height: AppSpacing.sm),
               _Field(

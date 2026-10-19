@@ -61,9 +61,9 @@ class _CounterOrchestrator extends StatelessWidget {
           case CounterSaleError(:final message):
             AppToast.show(ctx, message, isError: true);
             ctx.read<CounterCubit>().dismissError();
-          case CounterSold():
-            getIt<BalanceCubit>().refresh();
-            getIt<OrdersCubit>().refresh();
+          case CounterSold(:final orderId):
+            getIt<BalanceCubit>().refreshAfterSale();
+            getIt<OrdersCubit>().upsertOrder(orderId);
             getIt<DashboardCubit>().refresh();
           default:
             break;

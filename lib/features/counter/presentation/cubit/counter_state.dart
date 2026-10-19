@@ -34,16 +34,34 @@ class CounterReady extends CounterState {
   final CounterPreview preview;
   final List<VendorItem> menu;
 
-  /// itemId → quantity (only items with a quantity > 0).
+  /// itemId → taps on + (the quantity, or the steps for a variable price).
   final Map<String, int> quantities;
   final bool isSubmitting;
 
   int get total => menu.fold(
     0,
-    (sum, item) => sum + item.price * (quantities[item.id] ?? 0),
+    (sum, item) => sum + item.amountFor(quantities[item.id] ?? 0),
   );
 
-  int get itemCount => quantities.values.fold(0, (a, b) => a + b);
+  /// A variable-price item counts as one, whatever its amount.
+  int get itemCount => menu.fold(0, (sum, item) {
+    final units = quantities[item.id] ?? 0;
+    return sum + (item.isVariablePrice && units > 0 ? 1 : units);
+  });
+
+  /// Lines sent to the API: the picked amount for a variable-price item,
+  /// the quantity otherwise.
+  List<({String itemId, int quantity, int? amount})> get lines => [
+    for (final item in menu)
+      if ((quantities[item.id] ?? 0) > 0)
+        item.isVariablePrice
+            ? (
+                itemId: item.id,
+                quantity: 1,
+                amount: item.amountFor(quantities[item.id]!),
+              )
+            : (itemId: item.id, quantity: quantities[item.id]!, amount: null),
+  ];
 
   bool get isEmpty => quantities.isEmpty;
 
@@ -70,7 +88,12 @@ class CounterSaleError extends CounterState {
 }
 
 class CounterSold extends CounterState {
-  const CounterSold({required this.preview, required this.total});
+  const CounterSold({
+    required this.preview,
+    required this.orderId,
+    required this.total,
+  });
   final CounterPreview preview;
+  final String orderId;
   final int total;
 }

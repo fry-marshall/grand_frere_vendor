@@ -9,12 +9,14 @@ abstract class ItemsRepository {
     String vendorId, {
     required String name,
     required int price,
+    int? step,
     String? description,
   });
   Future<Either<Failure, VendorItem>> updateItem(
     String id, {
     String? name,
     int? price,
+    int? step,
     String? description,
     String? status,
   });
