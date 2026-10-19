@@ -9,12 +9,14 @@ abstract class ItemsRemoteDataSource {
     String vendorId, {
     required String name,
     required int price,
+    int? step,
     String? description,
   });
   Future<VendorItemModel> updateItem(
     String id, {
     String? name,
     int? price,
+    int? step,
     String? description,
     String? status,
   });
@@ -41,9 +43,11 @@ class ItemsRemoteDataSourceImpl implements ItemsRemoteDataSource {
     String vendorId, {
     required String name,
     required int price,
+    int? step,
     String? description,
   }) async {
     final body = <String, dynamic>{'name': name, 'price': price};
+    if (step != null) body['step'] = step;
     if (description != null && description.isNotEmpty) {
       body['description'] = description;
     }
@@ -56,12 +60,14 @@ class ItemsRemoteDataSourceImpl implements ItemsRemoteDataSource {
     String id, {
     String? name,
     int? price,
+    int? step,
     String? description,
     String? status,
   }) async {
     final body = <String, dynamic>{};
     if (name != null) body['name'] = name;
     if (price != null) body['price'] = price;
+    if (step != null) body['step'] = step;
     if (description != null) body['description'] = description;
     if (status != null) body['status'] = status;
     final res = await _client.put('/items/$id', data: body);

@@ -6,7 +6,10 @@ import '../models/wallet_movement_model.dart';
 abstract class BalanceRemoteDataSource {
   Future<VendorBalanceModel> getBalance(String vendorId);
   Future<List<VendorWithdrawalModel>> getWithdrawals(String vendorId);
-  Future<List<WalletMovementModel>> getMovements(String vendorId);
+  Future<List<WalletMovementModel>> getMovements(
+    String vendorId, {
+    int limit = 50,
+  });
   Future<VendorWithdrawalModel> createWithdrawal(
     String vendorId, {
     required int amount,
@@ -40,10 +43,13 @@ class BalanceRemoteDataSourceImpl implements BalanceRemoteDataSource {
   }
 
   @override
-  Future<List<WalletMovementModel>> getMovements(String vendorId) async {
+  Future<List<WalletMovementModel>> getMovements(
+    String vendorId, {
+    int limit = 50,
+  }) async {
     final res = await _client.get(
       '/vendors/$vendorId/wallet/transactions',
-      query: {'limit': '50'},
+      query: {'limit': '$limit'},
     );
     final data = res.data['data'] as Map<String, dynamic>;
     final items = data['data'] as List<dynamic>;

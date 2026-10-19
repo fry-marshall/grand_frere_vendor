@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../menu/domain/entities/vendor_item.dart';
+import '../../../menu/presentation/widgets/item_price_label.dart';
 
 class CounterMenuItemRow extends StatelessWidget {
   const CounterMenuItemRow({
@@ -53,7 +54,7 @@ class CounterMenuItemRow extends StatelessWidget {
                   style: AppTextStyles.cardTitle.copyWith(color: AppColors.ink),
                 ),
                 Text(
-                  '${formatXof(item.price)} FCFA',
+                  itemPriceLabel(item),
                   style: AppTextStyles.caption.copyWith(color: AppColors.mute),
                 ),
               ],
@@ -64,9 +65,11 @@ class CounterMenuItemRow extends StatelessWidget {
             onTap: enabled && selected ? onDecrement : null,
           ),
           SizedBox(
-            width: 36,
+            width: item.isVariablePrice ? 72 : 36,
             child: Text(
-              '$quantity',
+              item.isVariablePrice && selected
+                  ? '${formatXof(item.amountFor(quantity))} F'
+                  : '$quantity',
               textAlign: TextAlign.center,
               style: AppTextStyles.h3.copyWith(
                 color: selected ? AppColors.ink : AppColors.line,

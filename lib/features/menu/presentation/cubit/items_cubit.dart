@@ -27,6 +27,7 @@ class ItemsCubit extends Cubit<ItemsState> {
   Future<void> createItem({
     required String name,
     required int price,
+    int? step,
     String? description,
     String? imagePath,
   }) async {
@@ -37,6 +38,7 @@ class ItemsCubit extends Cubit<ItemsState> {
       _vendorId!,
       name: name,
       price: price,
+      step: step,
       description: description,
     );
     await result.fold(
@@ -56,6 +58,7 @@ class ItemsCubit extends Cubit<ItemsState> {
     String id, {
     String? name,
     int? price,
+    int? step,
     String? description,
     String? status,
   }) async {
@@ -66,6 +69,7 @@ class ItemsCubit extends Cubit<ItemsState> {
       id,
       name: name,
       price: price,
+      step: step,
       description: description,
       status: status
     );

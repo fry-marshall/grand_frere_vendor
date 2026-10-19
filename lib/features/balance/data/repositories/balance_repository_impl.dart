@@ -37,10 +37,11 @@ class BalanceRepositoryImpl implements BalanceRepository {
 
   @override
   Future<Either<Failure, List<WalletMovement>>> getMovements(
-    String vendorId,
-  ) async {
+    String vendorId, {
+    int limit = 50,
+  }) async {
     try {
-      return Right(await _ds.getMovements(vendorId));
+      return Right(await _ds.getMovements(vendorId, limit: limit));
     } on ApiException catch (e) {
       if (e.isNetworkError) return const Left(NetworkFailure());
       return Left(ServerFailure(e.firstMessage));

@@ -43,14 +43,20 @@ class CounterCubit extends Cubit<CounterState> {
 
     final result = await _repo.sell(
       cardCode: current.cardCode,
-      quantities: current.quantities,
+      lines: current.lines,
       pin: pin,
     );
     result.fold(
       (f) => emit(
         CounterSaleError(message: _mapFailure(f.message), previous: current),
       ),
-      (total) => emit(CounterSold(preview: current.preview, total: total)),
+      (sale) => emit(
+        CounterSold(
+          preview: current.preview,
+          orderId: sale.orderId,
+          total: sale.total,
+        ),
+      ),
     );
   }
 

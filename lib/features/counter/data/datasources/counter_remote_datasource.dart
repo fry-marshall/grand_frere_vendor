@@ -1,11 +1,12 @@
 import '../../../../core/network/api_client.dart';
+import '../../domain/entities/counter_sale.dart';
 import '../models/counter_preview_model.dart';
 
 abstract class CounterRemoteDataSource {
   Future<CounterPreviewModel> preview(String cardCode);
-  Future<int> sell({
+  Future<CounterSale> sell({
     required String cardCode,
-    required Map<String, int> quantities,
+    required List<({String itemId, int quantity, int? amount})> lines,
     required String pin,
   });
 }
@@ -26,9 +27,9 @@ class CounterRemoteDataSourceImpl implements CounterRemoteDataSource {
   }
 
   @override
-  Future<int> sell({
+  Future<CounterSale> sell({
     required String cardCode,
-    required Map<String, int> quantities,
+    required List<({String itemId, int quantity, int? amount})> lines,
     required String pin,
   }) async {
     final res = await _client.post(
@@ -36,13 +37,20 @@ class CounterRemoteDataSourceImpl implements CounterRemoteDataSource {
       data: {
         'cardCode': cardCode,
         'items': [
-          for (final e in quantities.entries)
-            {'itemId': e.key, 'quantity': e.value},
+          for (final line in lines)
+            {
+              'itemId': line.itemId,
+              'quantity': line.quantity,
+              if (line.amount != null) 'amount': line.amount,
+            },
         ],
         'pin': pin,
       },
     );
     final data = res.data['data'] as Map<String, dynamic>;
-    return (data['totalAmount'] as num).toInt();
+    return CounterSale(
+      orderId: data['id'] as String,
+      total: (data['totalAmount'] as num).toInt(),
+    );
   }
 }

@@ -39,6 +39,37 @@ class BalanceCubit extends Cubit<BalanceState> {
     if (_vendorId != null) await load(_vendorId!);
   }
 
+  /// A sale only moves the balance and adds a movement: fetch the balance and
+  /// the latest few movements instead of reloading every list — vendors are
+  /// on metered mobile data. Withdrawals are untouched by a sale.
+  Future<void> refreshAfterSale() async {
+    final loaded = state;
+    if (loaded is! BalanceLoaded) return refresh();
+
+    final balanceFuture = _repo.getBalance(_vendorId!);
+    final movementsFuture = _repo.getMovements(
+      _vendorId!,
+      limit: _latestMovementsLimit,
+    );
+    final balanceResult = await balanceFuture;
+    final movementsResult = await movementsFuture;
+    if (balanceResult.isLeft()) return;
+
+    final latest = movementsResult.getRight().toNullable() ?? [];
+    final latestIds = latest.map((m) => m.id).toSet();
+    emit(
+      loaded.copyWith(
+        balance: balanceResult.getRight().toNullable()!,
+        movements: [
+          ...latest,
+          ...loaded.movements.where((m) => !latestIds.contains(m.id)),
+        ],
+      ),
+    );
+  }
+
+  static const _latestMovementsLimit = 5;
+
   Future<void> createWithdrawal({
     required int amount,
     required String waveNumber,

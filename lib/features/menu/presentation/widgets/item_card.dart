@@ -6,9 +6,9 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_shadows.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
-import '../../../../core/utils/currency_formatter.dart';
 import '../../domain/entities/vendor_item.dart';
 import '../cubit/items_cubit.dart';
+import 'item_price_label.dart';
 
 class ItemCard extends StatelessWidget {
   const ItemCard({
@@ -83,7 +83,7 @@ class ItemCard extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        '${formatXof(item.price)} FCFA',
+                        itemPriceLabel(item),
                         style: AppTextStyles.h3.copyWith(color: AppColors.maroon),
                       ),
                       const Spacer(),
