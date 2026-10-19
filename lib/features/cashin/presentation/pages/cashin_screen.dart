@@ -58,8 +58,8 @@ class _CashinOrchestratorState extends State<_CashinOrchestrator> {
           AppToast.show(ctx, state.message, isError: true);
         }
         if (state is CashinCompleted) {
-          getIt<OrdersCubit>().refresh();
-          getIt<BalanceCubit>().refresh();
+          getIt<OrdersCubit>().upsertOrder(state.order.id);
+          getIt<BalanceCubit>().refreshAfterSale();
           getIt<DashboardCubit>().refresh();
         }
       },

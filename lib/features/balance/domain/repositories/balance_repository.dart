@@ -10,7 +10,10 @@ abstract class BalanceRepository {
   Future<Either<Failure, List<VendorWithdrawal>>> getWithdrawals(
     String vendorId,
   );
-  Future<Either<Failure, List<WalletMovement>>> getMovements(String vendorId);
+  Future<Either<Failure, List<WalletMovement>>> getMovements(
+    String vendorId, {
+    int limit = 50,
+  });
   Future<Either<Failure, VendorWithdrawal>> createWithdrawal(
     String vendorId, {
     required int amount,
