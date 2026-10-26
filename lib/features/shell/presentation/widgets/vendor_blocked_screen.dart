@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/widgets/support_contact_sheet.dart';
 
 /// Replaces the whole shell (no tabs, no FAB) when the vendor account is
 /// REJECTED or SUSPENDED — unlike PENDING, there's nothing to prep while
@@ -86,6 +87,12 @@ class VendorBlockedScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              _ActionButton(
+                label: 'Contacter le support',
+                color: AppColors.maroon,
+                onTap: () => SupportContactSheet.show(context),
+              ),
+              SizedBox(height: AppSpacing.sm),
               _ActionButton(
                 label: 'Supprimer mon compte',
                 color: AppColors.dangerText,

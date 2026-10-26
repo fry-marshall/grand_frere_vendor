@@ -12,6 +12,7 @@ import '../../../../core/theme/app_shadows.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_toast.dart';
+import '../../../../core/widgets/support_contact_sheet.dart';
 import '../../../auth/domain/repositories/auth_repository.dart';
 import '../../domain/entities/vendor.dart';
 import '../../domain/repositories/vendor_repository.dart';
@@ -149,6 +150,15 @@ class _AccountBody extends StatelessWidget {
                     label: 'Changer le mot de passe',
                     color: AppColors.maroon,
                     onTap: () => _ChangePasswordSheet.show(ctx),
+                  ),
+                  SizedBox(height: AppSpacing.lg),
+                  _SectionTitle('Aide'),
+                  SizedBox(height: AppSpacing.xs),
+                  _ActionTile(
+                    icon: Icons.support_agent_rounded,
+                    label: 'Contacter le support',
+                    color: AppColors.maroon,
+                    onTap: () => SupportContactSheet.show(ctx),
                   ),
                   SizedBox(height: AppSpacing.lg),
                   _SectionTitle('Session'),
