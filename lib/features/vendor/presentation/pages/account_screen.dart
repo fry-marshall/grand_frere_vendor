@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/auth/auth_bloc/auth_bloc.dart';
 import '../../../../core/auth/auth_bloc/auth_event.dart';
 import '../../../../core/auth/delete_account.dart';
+import '../../../../core/constants/legal_links.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
@@ -159,6 +161,16 @@ class _AccountBody extends StatelessWidget {
                     label: 'Contacter le support',
                     color: AppColors.maroon,
                     onTap: () => SupportContactSheet.show(ctx),
+                  ),
+                  SizedBox(height: AppSpacing.micro),
+                  _ActionTile(
+                    icon: Icons.description_outlined,
+                    label: 'Conditions & confidentialité',
+                    color: AppColors.maroon,
+                    onTap: () => launchUrl(
+                      LegalLinks.termsUri,
+                      mode: LaunchMode.externalApplication,
+                    ),
                   ),
                   SizedBox(height: AppSpacing.lg),
                   _SectionTitle('Session'),

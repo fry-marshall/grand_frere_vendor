@@ -10,6 +10,7 @@ import 'core/di/injection.dart';
 import 'core/notifications/push_notification_service.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'core/widgets/env_banner.dart';
 import 'features/vendor/presentation/cubit/vendor_cubit.dart';
 
 class App extends StatefulWidget {
@@ -63,6 +64,7 @@ class _AppState extends State<App> {
           theme: AppTheme.main,
           routerConfig: _appRouter.router,
           debugShowCheckedModeBanner: false,
+          builder: (context, child) => EnvBanner(child: child!),
           locale: const Locale('fr'),
           supportedLocales: const [Locale('fr')],
           localizationsDelegates: const [

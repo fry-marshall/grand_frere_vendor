@@ -1,5 +1,7 @@
 # Environment variables — never commit secrets
 .env
+.env.*
+!.env.example
 
 # Miscellaneous
 *.class
