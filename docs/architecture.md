@@ -130,7 +130,7 @@ Et dans `main.dart`, on appelle `configureDependencies()` au démarrage, avant `
 ```dart
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load();        // Charge les variables d'environnement (.env)
+  await dotenv.load(fileName: AppEnv.current.envFile); // .env.staging ou .env.production
   configureDependencies();    // ← Construit le graphe de dépendances
   runApp(const App());
 }
@@ -459,16 +459,27 @@ Aucune valeur n'est hardcodée dans les widgets. Tout passe par les tokens :
 
 ## 10. Variables d'environnement
 
-Les secrets (URL de l'API, clés) ne sont **jamais** dans le code. Ils sont dans un fichier `.env` à la racine (ignoré par git) :
+Deux environnements, `staging` et `production`, choisis au build via `--dart-define=APP_ENV` (`staging` par défaut, voir `lib/core/config/app_env.dart`). Chaque environnement a son fichier à la racine, ignoré par git (à créer depuis `.env.example`) :
 
 ```
-API_BASE_URL=https://api.grandfrere.com
+# .env.staging
+API_BASE_URL=https://gf-api.mfry.io/api/v1
+# .env.production
+API_BASE_URL=https://api.grandfrere.network/api/v1
 ```
+
+```bash
+flutter run                                    # staging
+flutter build appbundle --dart-define=APP_ENV=production
+flutter build ipa --dart-define=APP_ENV=production
+```
+
+En staging, un bandeau « STAGING » s'affiche en haut à droite (`EnvBanner`).
 
 Chargé au démarrage avec `flutter_dotenv` :
 
 ```dart
-await dotenv.load(); // lit .env
+await dotenv.load(fileName: AppEnv.current.envFile);
 // puis dans ApiClient :
 baseUrl: dotenv.env['API_BASE_URL'] ?? ''
 ```

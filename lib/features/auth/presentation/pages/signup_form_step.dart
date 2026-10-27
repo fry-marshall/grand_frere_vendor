@@ -1,6 +1,9 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/constants/legal_links.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -141,7 +144,13 @@ class SignupFormStep extends StatelessWidget {
                             style: AppTextStyles.caption.copyWith(
                               color: AppColors.maroon,
                               fontWeight: FontWeight.w700,
+                              decoration: TextDecoration.underline,
                             ),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () => launchUrl(
+                                    LegalLinks.termsUri,
+                                    mode: LaunchMode.externalApplication,
+                                  ),
                           ),
                           const TextSpan(
                               text:
