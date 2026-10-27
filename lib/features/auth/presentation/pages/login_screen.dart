@@ -11,6 +11,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../../core/widgets/terms_consent_text.dart';
 import '../bloc/login_bloc/login_bloc.dart';
 import '../bloc/login_bloc/login_event.dart';
 import '../bloc/login_bloc/login_state.dart';
@@ -137,6 +138,8 @@ class _LoginViewState extends State<_LoginView> {
                       onPressed: _submit,
                       isLoading: loading,
                     ),
+                    const SizedBox(height: AppSpacing.sm),
+                    const TermsConsentText(action: 'En vous connectant'),
                     const SizedBox(height: AppSpacing.lg),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
