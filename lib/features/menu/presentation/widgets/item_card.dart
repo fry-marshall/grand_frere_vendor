@@ -6,6 +6,7 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_shadows.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_text_styles.dart';
+import '../../../../core/utils/currency_formatter.dart';
 import '../../domain/entities/vendor_item.dart';
 import '../cubit/items_cubit.dart';
 import 'item_price_label.dart';
@@ -82,11 +83,29 @@ class ItemCard extends StatelessWidget {
                   SizedBox(height: AppSpacing.sm),
                   Row(
                     children: [
-                      Text(
-                        itemPriceLabel(item),
-                        style: AppTextStyles.h3.copyWith(color: AppColors.maroon),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              item.isVariablePrice
+                                  ? 'Dès ${formatXof(item.price)} FCFA'
+                                  : itemPriceLabel(item),
+                              style: AppTextStyles.h3.copyWith(color: AppColors.maroon),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (item.isVariablePrice)
+                              Text(
+                                'Pas de ${formatXof(item.step)} F',
+                                style: AppTextStyles.caption.copyWith(color: AppColors.mute),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                          ],
+                        ),
                       ),
-                      const Spacer(),
+                      SizedBox(width: AppSpacing.xs),
                       _IconAction(
                         icon: Icons.edit_outlined,
                         color: AppColors.violet,

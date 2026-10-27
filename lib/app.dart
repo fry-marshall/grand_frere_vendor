@@ -59,7 +59,7 @@ class _AppState extends State<App> {
           }
         },
         child: MaterialApp.router(
-          title: 'Grand Frère — Vendeur',
+          title: 'Grand Frère Pro',
           theme: AppTheme.main,
           routerConfig: _appRouter.router,
           debugShowCheckedModeBanner: false,
