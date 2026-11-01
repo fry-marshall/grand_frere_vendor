@@ -79,14 +79,14 @@ class _SplashScreenState extends State<SplashScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Image.asset(
-                  'assets/logo.png',
+                  'assets/logo_vendor.png',
                   width: 80,
                   height: 80,
                 ),
                 const SizedBox(height: 20),
                 Text(
                   'Vendeur',
-                  style: AppTextStyles.h3.copyWith(color: AppColors.gold),
+                  style: AppTextStyles.h3.copyWith(color: AppColors.vendorGreen),
                 ),
               ],
             ),

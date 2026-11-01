@@ -90,7 +90,7 @@ class _LoginViewState extends State<_LoginView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: AppSpacing.xl),
-                    Image.asset('assets/logo.png', width: 72, height: 72),
+                    Image.asset('assets/logo_vendor.png', width: 72, height: 72),
                     const SizedBox(height: AppSpacing.xxl),
                     Text(
                       'Connexion',

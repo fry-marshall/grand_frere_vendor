@@ -64,7 +64,7 @@ flutter:
   assets:
     - .env.staging
     - .env.production
-    - assets/logo.png
+    - assets/logo_vendor.png
     - assets/wave_logo.png
 
 flutter_launcher_icons:

@@ -7,6 +7,8 @@ abstract class AppColors {
   static const goldLight = Color(0xFFF1C878);
   static const goldSoft = Color(0xFFFBE9C0);
 
+  static const vendorGreen = Color(0xFF4A6E32);
+
   // --- Brand: Maroon (secondary) ---
   static const maroon = Color(0xFF5B1E0F);
   static const maroonDeep = Color(0xFF3E140A);
