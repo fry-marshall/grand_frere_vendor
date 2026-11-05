@@ -54,15 +54,9 @@ class OrderItemsCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Text(
-                    'Total',
-                    style: AppTextStyles.body.copyWith(color: AppColors.mute),
-                  ),
-                  SizedBox(width: AppSpacing.xs),
-                  OrderPaymentChip(isCash: order.isCash),
-                ],
+              Text(
+                'Total',
+                style: AppTextStyles.body.copyWith(color: AppColors.mute),
               ),
               Text(
                 '${formatXof(order.totalAmount)} FCFA',
@@ -107,28 +101,6 @@ class OrderItemRow extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class OrderPaymentChip extends StatelessWidget {
-  const OrderPaymentChip({super.key, required this.isCash});
-  final bool isCash;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: 2),
-      decoration: BoxDecoration(
-        color: isCash ? AppColors.infoSurface : AppColors.goldSoft,
-        borderRadius: AppRadius.pill,
-      ),
-      child: Text(
-        isCash ? 'Cash' : 'Wallet',
-        style: AppTextStyles.label.copyWith(
-          color: isCash ? AppColors.info : AppColors.brown,
-        ),
       ),
     );
   }

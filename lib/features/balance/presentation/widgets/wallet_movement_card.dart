@@ -15,8 +15,8 @@ class WalletMovementCard extends StatelessWidget {
 
   String get _label {
     if (movement.isCashin) return 'Encaissement';
-    if (movement.isWithdrawal) return 'Retrait';
-    if (movement.isWithdrawalRefund) return 'Retrait remboursé';
+    if (movement.isWithdrawal) return 'Versement';
+    if (movement.isWithdrawalRefund) return 'Versement annulé';
     return 'Ajustement';
   }
 

@@ -105,7 +105,7 @@ class SignupFormStep extends StatelessWidget {
                       textInputAction: TextInputAction.next,
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    const SignupSectionLabel('Paiement'),
+                    const SignupSectionLabel('Versement des recettes'),
                     WaveTextField(controller: waveCtrl),
                     const SizedBox(height: AppSpacing.sm),
                     AppTextField(

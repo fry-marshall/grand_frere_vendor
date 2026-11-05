@@ -95,7 +95,7 @@ class BalanceCubit extends Cubit<BalanceState> {
 
   String _mapCreateWithdrawalFailure(Failure f) => switch (f.message) {
     'Insufficient vendor wallet balance' =>
-      'Solde insuffisant pour ce retrait.',
+      'Solde insuffisant pour ce versement.',
     'Vendor wallet not found' => "Aucun solde disponible pour l'instant.",
     _ => f.message,
   };

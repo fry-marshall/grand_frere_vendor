@@ -39,7 +39,7 @@ class BalanceCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Solde du portefeuille',
+                  'Solde cantine',
                   style: AppTextStyles.body.copyWith(
                     color: Colors.white54,
                     fontSize: 10.5,

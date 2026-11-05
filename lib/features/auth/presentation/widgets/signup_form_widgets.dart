@@ -146,8 +146,6 @@ class _WaveTextFieldState extends State<WaveTextField> {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           child: Row(
             children: [
-              _WaveBadge(),
-              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: TextField(
                   controller: widget.controller,
@@ -178,18 +176,11 @@ class _WaveTextFieldState extends State<WaveTextField> {
         ),
         const SizedBox(height: 4),
         Text(
-          'Votre solde sera reversé chaque soir sur ce compte',
+          'Numéro sur lequel vos recettes vous seront versées',
           style: AppTextStyles.caption.copyWith(color: AppColors.mute),
         ),
       ],
     );
-  }
-}
-
-class _WaveBadge extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Image.asset('assets/wave_logo.png', width: 24, height: 24);
   }
 }
 

@@ -32,7 +32,6 @@ class VendorOrder {
   bool get isValidated => status == 'VALIDATED';
   bool get isCompleted => status == 'COMPLETED';
   bool get isCancelled => status == 'CANCELLED';
-  bool get isCash => paymentMethod == 'CASH';
 
   String get itemsSummary =>
       items.take(2).map((i) => '${i.quantity}× ${i.name}').join(' · ');

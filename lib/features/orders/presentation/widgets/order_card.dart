@@ -68,7 +68,6 @@ class OrderCard extends StatelessWidget {
               SizedBox(height: AppSpacing.sm),
               Row(
                 children: [
-                  OrderPaymentBadge(isCash: order.isCash),
                   const Spacer(),
                   Text(
                     '${formatXof(order.totalAmount)} FCFA',
@@ -125,44 +124,6 @@ class OrderStatusBadge extends StatelessWidget {
       ),
       decoration: BoxDecoration(color: _bg, borderRadius: AppRadius.pill),
       child: Text(_label, style: AppTextStyles.label.copyWith(color: _fg)),
-    );
-  }
-}
-
-class OrderPaymentBadge extends StatelessWidget {
-  const OrderPaymentBadge({super.key, required this.isCash});
-  final bool isCash;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: AppSpacing.xs,
-        vertical: AppSpacing.micro,
-      ),
-      decoration: BoxDecoration(
-        color: isCash ? AppColors.infoSurface : AppColors.goldSoft,
-        borderRadius: AppRadius.pill,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            isCash
-                ? Icons.payments_outlined
-                : Icons.account_balance_wallet_outlined,
-            size: 11,
-            color: isCash ? AppColors.info : AppColors.brown,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            isCash ? 'Cash' : 'Wallet',
-            style: AppTextStyles.label.copyWith(
-              color: isCash ? AppColors.info : AppColors.brown,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

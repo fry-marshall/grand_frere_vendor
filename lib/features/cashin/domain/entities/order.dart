@@ -27,5 +27,4 @@ class Order {
 
   String get studentFullName => '$studentFirstName $studentLastName';
 
-  bool get isCash => paymentMethod == 'CASH';
 }

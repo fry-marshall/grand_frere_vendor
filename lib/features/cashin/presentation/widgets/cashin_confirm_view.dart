@@ -218,35 +218,6 @@ class _StudentCard extends StatelessWidget {
               ],
             ),
           ),
-          // Payment method pill
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: Colors.white.withAlpha(28),
-              borderRadius: AppRadius.pill,
-              border: Border.all(color: Colors.white.withAlpha(50), width: 1),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  order.isCash
-                      ? Icons.payments_outlined
-                      : Icons.account_balance_wallet_outlined,
-                  color: Colors.white,
-                  size: 13,
-                ),
-                const SizedBox(width: 5),
-                Text(
-                  order.isCash ? 'Cash' : 'Wave',
-                  style: AppTextStyles.label.copyWith(
-                    color: Colors.white,
-                    fontSize: 11,
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );

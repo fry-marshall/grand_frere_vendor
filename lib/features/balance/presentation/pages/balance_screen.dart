@@ -45,7 +45,7 @@ class BalanceScreen extends StatelessWidget {
             onPressed: () => context.pop(),
           ),
           title: Text(
-            'Solde & Retraits',
+            'Solde & Versements',
             style: AppTextStyles.h3.copyWith(color: AppColors.maroon),
           ),
           actions: [
@@ -107,7 +107,7 @@ class BalanceScreen extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        'Historique des retraits',
+                        'Historique des versements',
                         style: AppTextStyles.h3.copyWith(color: AppColors.ink),
                       ),
                       if (loaded.withdrawals.isNotEmpty) ...[
@@ -133,7 +133,7 @@ class BalanceScreen extends StatelessWidget {
                   ),
                   SizedBox(height: AppSpacing.sm),
                   if (loaded.withdrawals.isEmpty)
-                    const _EmptyList(message: 'Aucun retrait pour le moment')
+                    const _EmptyList(message: 'Aucun versement pour le moment')
                   else
                     ...loaded.withdrawals.map(
                       (w) => WithdrawalCard(withdrawal: w),
@@ -236,7 +236,7 @@ class _BalanceHeader extends StatelessWidget {
                   ),
                   SizedBox(width: AppSpacing.xs),
                   Text(
-                    'Demander un retrait',
+                    'Demander un versement',
                     style: AppTextStyles.buttonSmall.copyWith(
                       color: Colors.white,
                     ),

@@ -65,7 +65,6 @@ flutter:
     - .env.staging
     - .env.production
     - assets/logo_vendor.png
-    - assets/wave_logo.png
 
 flutter_launcher_icons:
   android: true

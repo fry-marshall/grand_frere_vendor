@@ -101,12 +101,12 @@ class _WithdrawalFormSheetState extends State<WithdrawalFormSheet> {
               ),
               SizedBox(height: AppSpacing.md),
               Text(
-                'Demander un retrait',
+                'Demander un versement',
                 style: AppTextStyles.h2.copyWith(color: AppColors.ink),
               ),
               SizedBox(height: AppSpacing.micro),
               Text(
-                'Le montant sera transféré sur votre numéro Wave.',
+                "Votre demande sera traitée par l'équipe Grand Frère, puis le montant versé sur votre numéro Wave.",
                 style: AppTextStyles.body.copyWith(color: AppColors.mute),
               ),
               SizedBox(height: AppSpacing.lg),
@@ -167,7 +167,7 @@ class _WithdrawalFormSheetState extends State<WithdrawalFormSheet> {
                               ),
                             )
                           : Text(
-                              'Confirmer le retrait',
+                              'Confirmer le versement',
                               style: AppTextStyles.buttonLabel.copyWith(
                                 color: Colors.white,
                               ),
