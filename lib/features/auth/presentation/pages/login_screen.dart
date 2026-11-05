@@ -119,19 +119,6 @@ class _LoginViewState extends State<_LoginView> {
                       textInputAction: TextInputAction.done,
                       onSubmitted: (_) => _submit(),
                     ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () => context.push(Routes.forgot),
-                        child: Text(
-                          'Mot de passe oublié ?',
-                          style: AppTextStyles.caption.copyWith(
-                            color: AppColors.brown,
-                          ),
-                        ),
-                      ),
-                    ),
                     const SizedBox(height: AppSpacing.lg),
                     AppButton.primary(
                       label: 'Se connecter',
