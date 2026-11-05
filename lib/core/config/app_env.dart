@@ -3,7 +3,7 @@ enum AppEnv {
   production;
 
   static final current = AppEnv.values.byName(
-    const String.fromEnvironment('APP_ENV', defaultValue: 'staging'),
+    const String.fromEnvironment('APP_ENV', defaultValue: 'production'),
   );
 
   String get envFile => '.env.$name';

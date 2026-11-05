@@ -459,7 +459,7 @@ Aucune valeur n'est hardcodée dans les widgets. Tout passe par les tokens :
 
 ## 10. Variables d'environnement
 
-Deux environnements, `staging` et `production`, choisis au build via `--dart-define=APP_ENV` (`staging` par défaut, voir `lib/core/config/app_env.dart`). Chaque environnement a son fichier à la racine, ignoré par git (à créer depuis `.env.example`) :
+Deux environnements, `staging` et `production`, choisis au build via `--dart-define=APP_ENV` (`production` par défaut, voir `lib/core/config/app_env.dart`). Chaque environnement a son fichier à la racine, ignoré par git (à créer depuis `.env.example`) :
 
 ```
 # .env.staging
@@ -469,9 +469,9 @@ API_BASE_URL=https://api.grandfrere.network/api/v1
 ```
 
 ```bash
-flutter run                                    # staging
-flutter build appbundle --dart-define=APP_ENV=production
-flutter build ipa --dart-define=APP_ENV=production
+flutter run --dart-define=APP_ENV=staging      # staging
+flutter build appbundle                        # production
+flutter build ipa                              # production
 ```
 
 En staging, un bandeau « STAGING » s'affiche en haut à droite (`EnvBanner`).

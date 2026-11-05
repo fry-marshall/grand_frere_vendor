@@ -12,7 +12,12 @@
           "package_name": "com.example.grand_frere_vendor"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "64757699713-3qbakakcp6bu5f563musjrtq7jq31ff4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDegVRwjdsL2En9Bdbobs_KcwbTEzGbcKU"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "64757699713-3qbakakcp6bu5f563musjrtq7jq31ff4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
@@ -31,7 +41,12 @@
           "package_name": "com.grandfrere.grand_frere_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "64757699713-3qbakakcp6bu5f563musjrtq7jq31ff4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDegVRwjdsL2En9Bdbobs_KcwbTEzGbcKU"
@@ -39,7 +54,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "64757699713-3qbakakcp6bu5f563musjrtq7jq31ff4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     },
@@ -50,7 +70,12 @@
           "package_name": "com.grandfrere.grandfrereclient"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "64757699713-3qbakakcp6bu5f563musjrtq7jq31ff4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDegVRwjdsL2En9Bdbobs_KcwbTEzGbcKU"
@@ -58,7 +83,70 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "64757699713-3qbakakcp6bu5f563musjrtq7jq31ff4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:64757699713:android:f4150492cbc3848b15a980",
+        "android_client_info": {
+          "package_name": "network.grandfrere.family"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "64757699713-3qbakakcp6bu5f563musjrtq7jq31ff4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDegVRwjdsL2En9Bdbobs_KcwbTEzGbcKU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "64757699713-3qbakakcp6bu5f563musjrtq7jq31ff4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:64757699713:android:13f5f9459246c5cc15a980",
+        "android_client_info": {
+          "package_name": "network.grandfrere.vendor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "64757699713-3qbakakcp6bu5f563musjrtq7jq31ff4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDegVRwjdsL2En9Bdbobs_KcwbTEzGbcKU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "64757699713-3qbakakcp6bu5f563musjrtq7jq31ff4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

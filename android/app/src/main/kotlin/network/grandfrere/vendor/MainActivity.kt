@@ -1,4 +1,4 @@
-package com.example.grand_frere_vendor
+package network.grandfrere.vendor
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -51,18 +51,17 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDegVRwjdsL2En9Bdbobs_KcwbTEzGbcKU',
-    appId: '1:64757699713:android:71090f1c1e98af7515a980',
+    appId: '1:64757699713:android:13f5f9459246c5cc15a980',
     messagingSenderId: '64757699713',
     projectId: 'grand-frere-2bb6b',
     storageBucket: 'grand-frere-2bb6b.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDrz4JTrU9mReLT0fEV3kKBOrXhykO9OrE',
-    appId: '1:64757699713:ios:8cc9e366be2d87b915a980',
+    appId: '1:64757699713:ios:c867d8187cda149c15a980',
     messagingSenderId: '64757699713',
     projectId: 'grand-frere-2bb6b',
     storageBucket: 'grand-frere-2bb6b.firebasestorage.app',
-    iosBundleId: 'com.grandfrere.vendor',
+    iosBundleId: 'network.grandfrere.vendor',
   );
 }
